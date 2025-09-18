@@ -1,0 +1,86 @@
+/* Archivo: public/styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px 40px;
+    background: #fdfdfd;
+    color: #333;
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #e6b8af;
+    padding-bottom: 15px;
+}
+
+header img {
+    height: 60px;
+}
+
+header h1 {
+    color: #6a4f6d;
+    font-size: 24px;
+    margin: 0;
+}
+
+h2 {
+    background: #e6b8af;
+    padding: 10px;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+    border-radius: 5px;
+}
+
+table {
+    border-collapse: collapse;
+    margin-bottom: 25px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background: #e6b8af;
+    color: white;
+    font-weight: bold;
+}
+
+td.label {
+    text-align: left;
+    font-weight: bold;
+    width: 250px;
+    background: #f9f9f9;
+}
+
+input[type="text"], input[type="date"], input[type="number"], select, textarea {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.btn {
+    padding: 10px 20px;
+    background: #f37f58;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.btn:hover {
+    background: #e06d4a;
+}

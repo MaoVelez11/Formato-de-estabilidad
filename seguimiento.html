@@ -3,152 +3,112 @@
 <head>
   <meta charset="UTF-8">
   <title>Seguimiento de Productos en Estabilidad</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
   <header>
-    <img src="logo.png" alt="Logo de la Empresa" class="logo">
+    <img src="/images/logo.png" alt="Samara Cosmetics Logo">
     <h1>Módulo de Seguimiento de Estabilidad</h1>
+    <a href="formato.html" class="btn">Ir a Formato Completo ➔</a>
   </header>
 
-  <main>
-    <h2>Productos en Estudio</h2>
-    <table id="tablaEstabilidad">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Lote Interno</th>
-          <th>Producto</th>
-          <th>Registro Sanitario</th>
-          <th>Lote</th>
-          <th class="col-descripcion">Descripción del Producto</th>
-          <th class="col-pruebas">Pruebas a Realizar</th>
-          <th class="col-observaciones">Observaciones</th>
-          <th>Unidades</th>
-          <th>Fecha Fabricación</th>
-          <th>Fecha Inicio Estabilidad</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
-    <button class="boton-agregar" onclick="agregarNuevoEstudio()">➕ Agregar Nuevo Estudio</button>
-  </main>
+  <h2>SEGUIMIENTO PRODUCTOS EN PRUEBAS DE ESTABILIDAD ACELERADA Y NATURAL</h2>
+  
+  <table id="tablaEstabilidad">
+    <thead>
+      <tr>
+        <th>CONSECUTIVO</th>
+        <th>REFERENCIA</th>
+        <th>PRODUCTO</th>
+        <th>REGISTRO SANITARIO</th>
+        <th>LOTE</th>
+        <th>DESCRIPCIÓN</th>
+        <th>PRUEBAS</th>
+        <th>OBSERVACIONES</th>
+        <th>TOTAL UNIDADES</th>
+        <th>T0 (Liberación)</th>
+        <th>FECHA INGRESO</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><input type="text"></td>
+        <td><input type="text" value="SUNSCREEN - PROTECTOR SOLAR SPF 50"></td>
+        <td><input type="text" value="NSOC06553-21CO"></td>
+        <td><input type="text" value="SM0690225"></td>
+        <td><input type="text" value="PROTECTOR SOLAR SPF 50 CON COLOR - MAWIE (80 ML)"></td>
+        <td><input type="text" value="Apariencia, color, pH, Densidad, Viscosidad, etc."></td>
+        <td><textarea></textarea></td>
+        <td><input type="number"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+      </tr>
+    </tbody>
+  </table>
+  
+  <button class="btn" onclick="agregarFila()">➕ Agregar Fila</button>
+  <button class="btn" style="background-color: #65b45a;" onclick="guardarDatosSeguimiento()">💾 Guardar Datos</button>
 
-<script>
-const DB_NAME = "EstabilidadDB";
-const STORE_NAME = "productos";
-let db;
-
-function initDb() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, 1);
-
-    request.onupgradeneeded = event => {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains(STORE_NAME)) {
-        db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
-      }
-    };
-
-    request.onsuccess = event => {
-      db = event.target.result;
-      console.log("Base de datos abierta exitosamente");
-      resolve(db);
-    };
-
-    request.onerror = event => {
-      console.error("Error al abrir la base de datos:", event.target.errorCode);
-      reject(event.target.errorCode);
-    };
-  });
-}
-
-async function cargarEstudios() {
-  if (!db) await initDb();
-
-  const transaction = db.transaction(STORE_NAME, "readonly");
-  const objectStore = transaction.objectStore(STORE_NAME);
-  const request = objectStore.getAll();
-
-  request.onsuccess = event => {
-    const productos = event.target.result;
-    const tablaBody = document.getElementById("tablaEstabilidad").getElementsByTagName("tbody")[0];
-    tablaBody.innerHTML = ""; // Limpiar tabla antes de cargar
-
-    if (productos.length === 0) {
-        tablaBody.innerHTML = '<tr><td colspan="12">No hay estudios registrados. Haz clic en "Agregar Nuevo Estudio" para comenzar.</td></tr>';
-    } else {
-        productos.forEach(producto => {
-            const nuevaFila = tablaBody.insertRow();
-            nuevaFila.innerHTML = `
-                <td>${producto.id}</td>
-                <td>${producto.loteInterno || ''}</td>
-                <td>${producto.producto || ''}</td>
-                <td>${producto.registroSanitario || ''}</td>
-                <td>${producto.lote || ''}</td>
-                <td>${producto.descripcion || ''}</td>
-                <td>${producto.pruebas || 'Apariencia, color, pH, Densidad, Viscosidad, Aplicación, microbiología'}</td>
-                <td>${producto.observaciones || ''}</td>
-                <td>${producto.unidades || ''}</td>
-                <td>${producto.fechaFabricacion || ''}</td>
-                <td>${producto.fechaInicio || ''}</td>
-                <td><button class="boton-accion" onclick="verDetalles(${producto.id})">Ver/Editar</button></td>
-            `;
-        });
+  <script>
+    let consecutivo = 1;
+    function agregarFila() {
+      consecutivo++;
+      const tabla = document.getElementById("tablaEstabilidad").getElementsByTagName("tbody")[0];
+      const nuevaFila = tabla.insertRow();
+      nuevaFila.innerHTML = `
+        <td>${consecutivo}</td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text"></td>
+        <td><input type="text" value="Apariencia, color, pH, Densidad, Viscosidad, etc."></td>
+        <td><textarea></textarea></td>
+        <td><input type="number"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+      `;
     }
-  };
 
-  request.onerror = event => {
-      console.error("Error al cargar los estudios:", event.target.errorCode);
-  };
-}
+    function guardarDatosSeguimiento() {
+      const fila = document.querySelector("#tablaEstabilidad tbody tr"); // Simplificado para guardar la primera fila por ahora
+      const data = {
+        consecutivo: fila.cells[0].innerText,
+        referencia: fila.cells[1].querySelector('input').value,
+        producto: fila.cells[2].querySelector('input').value,
+        registro_sanitario: fila.cells[3].querySelector('input').value,
+        lote: fila.cells[4].querySelector('input').value,
+        descripcion: fila.cells[5].querySelector('input').value,
+        pruebas: fila.cells[6].querySelector('input').value,
+        observaciones: fila.cells[7].querySelector('textarea').value,
+        unidades: fila.cells[8].querySelector('input').value,
+        fecha_liberacion: fila.cells[9].querySelector('input').value,
+        fecha_inicio_camaras: fila.cells[10].querySelector('input').value,
+      };
 
-
-async function agregarNuevoEstudio() {
-    if (!db) await initDb();
-
-    const nuevoProducto = {
-        loteInterno: "Nuevo Lote",
-        producto: "Nuevo Producto",
-        // Datos iniciales vacíos
-        registroSanitario: "",
-        lote: "",
-        descripcion: "",
-        pruebas: "Apariencia, color, pH, Densidad, Viscosidad, Aplicación, microbiología",
-        observaciones: "",
-        unidades: 0,
-        fechaFabricacion: "",
-        fechaInicio: "",
-        // Objeto para almacenar los datos del formato completo
-        datosFormato: {}
-    };
-
-    const transaction = db.transaction(STORE_NAME, "readwrite");
-    const objectStore = transaction.objectStore(STORE_NAME);
-    const request = objectStore.add(nuevoProducto);
-
-    request.onsuccess = event => {
-        console.log("Nuevo estudio agregado con ID:", event.target.result);
-        // Redirigir al formato completo para llenar los detalles
-        verDetalles(event.target.result);
-    };
-
-    request.onerror = event => {
-        console.error("Error al agregar nuevo estudio:", event.target.errorCode);
-    };
-}
-
-
-function verDetalles(id) {
-  window.location.href = `formato-completo.html?id=${id}`;
-}
-
-// Cargar los estudios cuando la página esté lista
-window.onload = cargarEstudios;
-</script>
+      if (!data.lote) {
+        alert("El campo 'LOTE' es obligatorio para guardar.");
+        return;
+      }
+      
+      fetch('/api/estudio', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(response => {
+        console.log('Success:', response);
+        alert(`Estudio para el lote ${data.lote} guardado exitosamente.`);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Hubo un error al guardar los datos.');
+      });
+    }
+  </script>
 
 </body>
 </html>
