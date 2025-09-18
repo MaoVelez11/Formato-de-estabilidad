@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Seguimiento de Productos en Estabilidad</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Estilos base para una correcta visualización */
+    th, td {
+      border: 1px solid #ccc;
+      padding: 4px;
+      text-align: center;
+      vertical-align: top;
+    }
+    textarea { width: 95%; min-height: 50px; resize: vertical; box-sizing: border-box; }
+    
+    /* --- CORRECCIÓN FINAL AQUÍ --- */
+    /* Regla general para TODOS los encabezados de la tabla */
+    th { 
+      background-color: #f0f0f0; 
+      color: #333; /* Color de texto oscuro para todos los th por defecto */
+    }
+
+    /* Reglas específicas para las secciones de color (mantienen el texto oscuro) */
+    .acelerada { background-color: #fdd; }
+    .natural { background-color: #dfd; }
+    .aprobacion { background-color: #ffecb3; }
+
+    /* Regla para los subtítulos para asegurar fondo blanco */
+    #tablaEstabilidad thead tr:nth-child(2) th {
+        background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="/logo.png" alt="Samara Cosmetics Logo" class="h-8 w-auto">
+    <h1>Módulo de Seguimiento de Estabilidad</h1>
+    <a href="formato.html" class="btn">Ir a Formato Completo ➔</a>
+  </header>
+
+  <h2>SEGUIMIENTO PRODUCTOS EN PRUEBAS DE ESTABILIDAD ACELERADA Y NATURAL</h2>
+
+  <table id="tablaEstabilidad">
+    <thead>
+      <tr>
+        <th rowspan="2">✔</th>
+        <th rowspan="2">Consecutivo</th>
+        <th rowspan="2">Referencia</th>
+        <th rowspan="2">Producto</th>
+        <th rowspan="2">Registro Sanitario</th>
+        <th rowspan="2">Lote</th>
+        <th rowspan="2">Descripción</th>
+        <th rowspan="2">Pruebas</th>
+        <th rowspan="2">Observaciones</th>
+        <th rowspan="2">Total Unidades</th>
+        <th class="acelerada" colspan="6">Estabilidad Acelerada</th>
+        <th class="natural" colspan="12">Estabilidad Natural</th>
+        <th class="aprobacion" colspan="2">Aprobación</th>
+        <th rowspan="2">Tiempo Exp. (meses)</th>
+        <th colspan="2">Estadísticos</th>
+        <th rowspan="2">Comentarios</th>
+        <th rowspan="2">Acción</th>
+      </tr>
+      <tr>
+        <th>Cantidad</th><th>Ubicación</th><th>T0</th><th>T1</th><th>T2</th><th>T3</th>
+        <th>Cantidad</th><th>Ubicación</th><th>T3</th><th>T6</th><th>T9</th><th>T12</th>
+        <th>T18</th><th>T24</th><th>T27</th><th>T30</th><th>T33</th><th>T36</th>
+        <th>Sin Fecha Exp.</th><th>Con Fecha Exp.</th>
+        <th>Sí</th><th>No</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><input type="checkbox"></td>
+        <td class="consec">1</td>
+        <td><input type="text" class="campo"></td>
+        <td><textarea class="campo"></textarea></td>
+        <td><input type="text" class="campo"></td>
+        <td><input type="text" class="campo"></td>
+        <td><textarea class="campo"></textarea></td>
+        <td><textarea class="pruebas"></textarea></td>
+        <td><textarea></textarea></td>
+        <td><input type="number" min="0"></td>
+        <td><input type="number" min="0"></td>
+        <td><input type="text"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="number" min="0"></td>
+        <td><input type="text"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="date"></td>
+        <td><input type="radio" name="aprob1" value="Sin Fecha Exp."></td>
+        <td><input type="radio" name="aprob1" value="Con Fecha Exp."></td>
+        <td><input type="number" min="0"></td>
+        <td><input type="radio" name="estad1" value="si"></td>
+        <td><input type="radio" name="estad1" value="no"></td>
+        <td><textarea></textarea></td>
+        <td><button class="btn" style="padding: 6px 12px; font-size: 12px;" onclick="editarProducto(this)">Acceder / Editar</button></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <button class="btn" onclick="agregarFila()">➕ Agregar Fila</button>
+  <button class="btn" style="background-color: #dc3545;" onclick="eliminarFila()">🗑️ Eliminar Fila</button>
+  <button class="btn" style="background-color: #65b45a;" onclick="guardarDatosSeguimiento()">💾 Guardar Datos</button>
+
+  <script>
+    // --- FUNCIONES DE MANEJO DE LA TABLA ---
+    function autoResize(el) {
+      el.style.height = "auto";
+      el.style.height = el.scrollHeight + "px";
+    }
+
+    function actualizarConsecutivos() {
+      let filas = document.querySelectorAll("#tablaEstabilidad tbody tr");
+      filas.forEach((fila, i) => {
+        fila.querySelector(".consec").innerText = i + 1;
+        fila.querySelectorAll("input[type='radio']").forEach(radio => {
+          if (radio.name.startsWith("aprob")) {
+            radio.name = "aprob" + (i + 1);
+          } else if (radio.name.startsWith("estad")) {
+            radio.name = "estad" + (i + 1);
+          }
+        });
+      });
+    }
+    
+    function agregarFila() {
+      let tabla = document.getElementById("tablaEstabilidad").getElementsByTagName("tbody")[0];
+      let nuevaFila = tabla.rows[0].cloneNode(true);
+      nuevaFila.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.type === "checkbox" || el.type === "radio") {
+          el.checked = false;
+        } else { el.value = ""; }
+        if (el.tagName === "TEXTAREA") autoResize(el);
+      });
+      tabla.appendChild(nuevaFila);
+      actualizarConsecutivos();
+      asignarEventosFila(nuevaFila);
+    }
+
+    function eliminarFila() {
+      const tabla = document.getElementById("tablaEstabilidad").getElementsByTagName("tbody")[0];
+      const filasParaEliminar = Array.from(tabla.querySelectorAll("input[type='checkbox']:checked"));
+      const totalFilas = tabla.rows.length;
+
+      if (filasParaEliminar.length === 0) {
+        alert("Por favor, seleccione al menos una fila para eliminar.");
+        return;
+      }
+      if (filasParaEliminar.length === totalFilas) {
+        alert("No puede eliminar todas las filas. Debe quedar al menos una.");
+        return;
+      }
+      
+      const confirmado = confirm(`¿Está seguro de que desea eliminar las ${filasParaEliminar.length} fila(s) seleccionada(s)?`);
+
+      if (confirmado) {
+        filasParaEliminar.forEach(chk => {
+          chk.closest('tr').remove();
+        });
+        actualizarConsecutivos();
+      }
+    }
+    
+    function asignarEventosFila(fila) {
+      let campos = fila.querySelectorAll(".campo");
+      let pruebas = fila.querySelector(".pruebas");
+      fila.querySelectorAll("textarea").forEach(area => {
+        autoResize(area);
+        area.addEventListener("input", () => autoResize(area));
+      });
+      campos.forEach(campo => {
+        campo.addEventListener("input", () => {
+          let llenos = 0;
+          campos.forEach(c => { if (c.value.trim() !== "") llenos++; });
+          if (llenos >= 4 && pruebas.value.trim() === "") {
+            pruebas.value = "Apariencia, color, pH, Densidad, Viscosidad, Aplicación, microbiología";
+            autoResize(pruebas);
+          }
+        });
+      });
+    }
+
+    // --- FUNCIONES DE LÓGICA DE DATOS ---
+    function editarProducto(boton) {
+      const fila = boton.closest('tr');
+      const loteInput = fila.cells[5].querySelector('input'); // Celda 5 es Lote
+      const lote = loteInput ? loteInput.value : '';
+      if (lote) {
+        alert('Accediendo al detalle del lote: ' + lote);
+        window.location.href = `formato.html?lote=${lote}`;
+      } else {
+        alert('Por favor, ingrese un número de lote para poder acceder.');
+      }
+    }
+
+    function guardarDatosSeguimiento() {
+      const filas = document.querySelectorAll("#tablaEstabilidad tbody tr");
+      const datosParaGuardar = [];
+      filas.forEach(fila => {
+        const datosFila = {
+          referencia: fila.cells[2].querySelector('input').value,
+          producto: fila.cells[3].querySelector('textarea').value,
+          registro_sanitario: fila.cells[4].querySelector('input').value,
+          lote: fila.cells[5].querySelector('input').value,
+          descripcion: fila.cells[6].querySelector('textarea').value,
+          pruebas: fila.cells[7].querySelector('textarea').value,
+          observaciones: fila.cells[8].querySelector('textarea').value,
+          total_unidades: fila.cells[9].querySelector('input').value,
+          acelerada_cantidad: fila.cells[10].querySelector('input').value,
+          acelerada_ubicacion: fila.cells[11].querySelector('input').value,
+          acelerada_t0: fila.cells[12].querySelector('input').value,
+          acelerada_t1: fila.cells[13].querySelector('input').value,
+          acelerada_t2: fila.cells[14].querySelector('input').value,
+          acelerada_t3: fila.cells[15].querySelector('input').value,
+          natural_cantidad: fila.cells[16].querySelector('input').value,
+          natural_ubicacion: fila.cells[17].querySelector('input').value,
+          natural_t3: fila.cells[18].querySelector('input').value,
+          natural_t6: fila.cells[19].querySelector('input').value,
+          natural_t9: fila.cells[20].querySelector('input').value,
+          natural_t12: fila.cells[21].querySelector('input').value,
+          natural_t18: fila.cells[22].querySelector('input').value,
+          natural_t24: fila.cells[23].querySelector('input').value,
+          natural_t27: fila.cells[24].querySelector('input').value,
+          natural_t30: fila.cells[25].querySelector('input').value,
+          natural_t33: fila.cells[26].querySelector('input').value,
+          natural_t36: fila.cells[27].querySelector('input').value,
+          aprobacion: fila.querySelector('input[name^="aprob"]:checked')?.value || '',
+          tiempo_exp_meses: fila.cells[30].querySelector('input').value,
+          estadisticos: fila.querySelector('input[name^="estad"]:checked')?.value || '',
+          comentarios: fila.cells[32].querySelector('textarea').value
+        };
+        datosParaGuardar.push(datosFila);
+      });
+
+      console.log("Datos listos para enviar:", datosParaGuardar);
+      fetch('/api/estudio', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(datosParaGuardar)
+      })
+      .then(res => res.json())
+      .then(response => {
+        alert(response.message || "Datos guardados con éxito");
+      })
+      .catch(error => {
+        console.error("Error al guardar:", error);
+        alert("Hubo un error al guardar los datos.");
+      });
+    }
+
+    // --- INICIALIZACIÓN AL CARGAR LA PÁGINA ---
+    document.addEventListener("DOMContentLoaded", () => {
+        actualizarConsecutivos();
+        document.querySelectorAll("#tablaEstabilidad tbody tr").forEach(asignarEventosFila);
+    });
+  </script>
+
+</body>
+</html>

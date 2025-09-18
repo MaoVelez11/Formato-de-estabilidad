@@ -1,5 +1,7 @@
 // Archivo: database.js
 const sqlite3 = require('sqlite3').verbose();
+
+// Conectarse al archivo de la base de datos. Se creará si no existe.
 const db = new sqlite3.Database('./stability.db', (err) => {
     if (err) {
         console.error("Error abriendo la base de datos: " + err.message);
@@ -8,40 +10,64 @@ const db = new sqlite3.Database('./stability.db', (err) => {
     }
 });
 
-// Creación de las tablas si no existen
+// Usamos db.serialize para asegurar que los comandos se ejecuten en orden
 db.serialize(() => {
-    // Tabla para el módulo de seguimiento
+    console.log("Creando tablas si no existen...");
+
+    // Tabla 1: Clientes (Identificados por el titular)
     db.run(`
-        CREATE TABLE IF NOT EXISTS estudios (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            consecutivo INTEGER UNIQUE,
-            referencia TEXT,
-            producto TEXT,
+        CREATE TABLE IF NOT EXISTS Clientes (
+            id_cliente INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_titular TEXT NOT NULL UNIQUE
+        )
+    `);
+
+    // Tabla 2: Productos
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Productos (
+            id_producto INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre_producto TEXT NOT NULL,
+            referencia TEXT UNIQUE
+        )
+    `);
+
+    // Tabla 3: Estudios (Conecta Clientes y Productos a través de un Lote)
+    db.run(`
+        CREATE TABLE IF NOT EXISTS Estudios (
+            id_estudio INTEGER PRIMARY KEY AUTOINCREMENT,
+            lote TEXT NOT NULL UNIQUE,
             registro_sanitario TEXT,
-            lote TEXT UNIQUE,
             descripcion TEXT,
             pruebas TEXT,
             observaciones TEXT,
             unidades INTEGER,
             fecha_liberacion DATE,
-            fecha_inicio_camaras DATE
+            fecha_inicio_camaras DATE,
+            id_cliente INTEGER,
+            id_producto INTEGER,
+            FOREIGN KEY (id_cliente) REFERENCES Clientes(id_cliente),
+            FOREIGN KEY (id_producto) REFERENCES Productos(id_producto)
         )
     `);
 
-    // Tabla para los datos del formato completo
-    // Relacionada por el número de lote
+    // Tabla 4: Resultados (Almacena cada medición de un estudio)
     db.run(`
-        CREATE TABLE IF NOT EXISTS resultados (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            lote_estudio TEXT,
-            tipo_estabilidad TEXT, -- 'Acelerada' o 'Natural'
-            parametro TEXT,
-            tiempo TEXT, -- 'T0', 'T1', 'T3', etc.
+        CREATE TABLE IF NOT EXISTS Resultados (
+            id_resultado INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_estudio INTEGER,
+            parametro TEXT NOT NULL,
+            tiempo TEXT NOT NULL,
             especificacion TEXT,
-            resultado TEXT, -- 'Cumple', 'No Cumple', o el valor numérico
-            FOREIGN KEY (lote_estudio) REFERENCES estudios(lote)
+            resultado TEXT,
+            FOREIGN KEY (id_estudio) REFERENCES Estudios(id_estudio)
         )
-    `);
+    `, (err) => {
+        if (err) {
+            console.error("Error creando tabla Resultados:", err.message);
+        } else {
+            console.log("Estructura de la base de datos lista.");
+        }
+    });
 });
 
 module.exports = db;
