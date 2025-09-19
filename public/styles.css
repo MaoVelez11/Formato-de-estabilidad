@@ -65,6 +65,15 @@ table {
   width: 100%;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+/* --- ANCHO DE COLUMNAS ESPECÍFICAS --- */
+#tablaEstabilidad th:nth-child(3) { min-width: 150px; } /* Referencia */
+#tablaEstabilidad th:nth-child(4) { min-width: 150px; } /* Producto */
+#tablaEstabilidad th:nth-child(5) { min-width: 150px; } /* Registro Sanitario */
+#tablaEstabilidad th:nth-child(6) { min-width: 100px; } /* Lote */
+#tablaEstabilidad th:nth-child(7) { min-width: 150px; } /* Descripción */
+#tablaEstabilidad th:nth-child(8) { min-width: 150px; } /* Pruebas */
+#tablaEstabilidad th:nth-child(9) { min-width: 150px; } /* Observaciones */
+#tablaEstabilidad th:nth-child(10) { min-width: 120px; } /* Total Unidades */
 
 th,
 td {
