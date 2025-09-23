@@ -100,19 +100,48 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
 .param-box-corrected .value-cell input:focus {
     outline: 1px solid #a0a0ff;
 }
+/* --- ESTILOS PARA EL VISUALIZADOR DE CONSECUTIVO --- */
+#consecutivo-display {
+    position: absolute;
+    top: 20px;
+    right: 250px; /* Ajusta este valor si es necesario */
+    background-color: #6a4f6d;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#consecutivo-display span {
+    display: block;
+    font-size: 11px;
+    opacity: 0.8;
+    line-height: 1;
+}
+#consecutivo-display strong {
+    font-size: 24px;
+    display: block;
+    line-height: 1.2;
+}
+header {
+    position: relative; /* Necesario para que el posicionamiento de #consecutivo-display funcione */
+}
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <img src="logo.png" alt="Samara Cosmetics Logo" />
-            <h1>Formato Completo de Estabilidad</h1>
-            <div id="consecutivo-display">
-                <span>Consecutivo</span>
-                <strong id="consecutivo-numero">--</strong>
-            </div>
-            <a href="seguimiento.html" class="btn">ᐊ Volver a Seguimiento</a>
-        </header>
+    <img src="logo.png" alt="Samara Cosmetics Logo" />
+    <h1>Formato Completo de Estabilidad</h1>
+
+    <div id="consecutivo-display">
+        <span>Consecutivo</span>
+        <strong id="consecutivo-numero">--</strong>
+    </div>
+
+    <a href="seguimiento.html" class="btn">ᐊ Volver a Seguimiento</a>
+</header>
 
         <form id="formato-completo">
             <h2>INFORMACIÓN GENERAL</h2>
@@ -519,22 +548,51 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
     </div>
 
     <script>
+      // --- NUEVA FUNCIÓN AUXILIAR PARA AÑADIR MESES A UNA FECHA ---
+function addMonths(dateString, months) {
+    if (!dateString) return '';
+    const baseDate = new Date(dateString + 'T00:00:00');
+    baseDate.setMonth(baseDate.getMonth() + months);
+    return baseDate.toISOString().split('T')[0];
+}
+
+// --- NUEVA FUNCIÓN PRINCIPAL PARA CALCULAR Y ASIGNAR TODAS LAS FECHAS ---
+function actualizarFechasEstabilidad() {
+    const fechaInicio = document.querySelector('[name="fecha_inicio"]').value;
+
+    // Asigna T0
+    const t0Field = document.querySelector('[name="acelerada_t0"]');
+    if(t0Field) t0Field.value = fechaInicio;
+
+    // Asigna el resto de fechas calculadas
+    document.querySelector('[name="acelerada_t1"]').value = addMonths(fechaInicio, 1);
+    document.querySelector('[name="acelerada_t2"]').value = addMonths(fechaInicio, 2);
+    document.querySelector('[name="acelerada_t3"]').value = addMonths(fechaInicio, 3);
+    document.querySelector('[name="natural_t3"]').value = addMonths(fechaInicio, 3);
+    document.querySelector('[name="natural_t6"]').value = addMonths(fechaInicio, 6);
+    document.querySelector('[name="natural_t9"]').value = addMonths(fechaInicio, 9);
+    document.querySelector('[name="natural_t12"]').value = addMonths(fechaInicio, 12);
+    document.querySelector('[name="natural_t18"]').value = addMonths(fechaInicio, 18);
+    document.querySelector('[name="natural_t24"]').value = addMonths(fechaInicio, 24);
+    document.querySelector('[name="natural_t36"]').value = addMonths(fechaInicio, 36);
+}
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('textarea').forEach(area => {
-            autoResize(area);
-            area.addEventListener('input', () => autoResize(area));
-        });
-        const urlParams = new URLSearchParams(window.location.search);
-        const lote = urlParams.get('lote');
-        const consecutivo = urlParams.get('consecutivo');
-        if (consecutivo) {
-            document.getElementById('consecutivo-numero').innerText = consecutivo;
-        }
-        if (lote) {
-            document.getElementById('lote-principal').readOnly = true;
-            cargarDatosDeProducto(lote);
-        }
-    });
+    // ... tu código existente para autoResize ...
+    document.querySelector('[name="fecha_inicio"]').addEventListener('change', actualizarFechasEstabilidad);
+    const urlParams = new URLSearchParams(window.location.search);
+    const lote = urlParams.get('lote');
+    const consecutivo = urlParams.get('consecutivo'); // <-- Línea nueva
+
+    // Lógica para mostrar el consecutivo
+    if (consecutivo) {
+        document.getElementById('consecutivo-numero').innerText = consecutivo;
+    }
+
+    if (lote) {
+        document.getElementById('lote-principal').readOnly = true;
+        cargarDatosDeProducto(lote);
+    }
+});
 
     async function cargarDatosDeProducto(lote) {
         try {
@@ -567,70 +625,82 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
     }
 
     async function guardarFormulario() {
-        const form = document.getElementById('formato-completo');
-        if (!form.checkValidity()) {
-            alert("Por favor, complete los campos obligatorios.");
-            return;
-        }
-
-        const producto = {};
-        form.querySelectorAll('.table-wrapper:first-of-type [name]').forEach(field => {
-            producto[field.name] = field.value;
-        });
-        
-        const resultados = [];
-        document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
-            const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
-            let analisisActual = '';
-            tabla.querySelectorAll('tbody tr').forEach(fila => {
-                const celdaAnalisis = fila.querySelector('td[data-analisis]');
-                if (celdaAnalisis) analisisActual = celdaAnalisis.dataset.analisis;
-                const celdaParametro = fila.querySelector('td[data-parametro]');
-                if (celdaParametro) {
-                    const parametro_evaluado = celdaParametro.dataset.parametro;
-                    const especificacionInput = fila.cells[3]?.querySelector('textarea, input');
-                    const especificacion = especificacionInput ? especificacionInput.value : '';
-                    fila.querySelectorAll('select[data-tiempo], input[data-tiempo]').forEach(input => {
-                        if (input.value && input.value.trim() !== '') {
-                            resultados.push({
-                                tipo_estabilidad,
-                                analisis: analisisActual,
-                                parametro_evaluado,
-                                tiempo: input.dataset.tiempo,
-                                especificacion,
-                                resultado: input.value
-                            });
-                        }
-                    });
-                }
-            });
-        });
-        
-        const payload = { ...producto, resultados };
-        const loteInput = document.getElementById('lote-principal');
-        const esModoEdicion = loteInput.readOnly;
-        let url = 'http://localhost:3000/api/productos';
-        let method = 'POST';
-        if (esModoEdicion) {
-            url = `http://localhost:3000/api/productos/${loteInput.value}`;
-            method = 'PUT';
-        }
-
-        try {
-            const response = await fetch(url, {
-                method: method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.message || 'Error del servidor');
-            alert(data.message);
-            window.location.href = 'seguimiento.html';
-        } catch (error) {
-            console.error('Error al guardar:', error);
-            alert(`No se pudo guardar: ${error.message}`);
-        }
+    const form = document.getElementById('formato-completo');
+    if (!form.checkValidity()) {
+        alert("Por favor, complete los campos obligatorios.");
+        return;
     }
+
+    const producto = {};
+    // Recoge los campos de la tabla "INFORMACIÓN GENERAL"
+    form.querySelectorAll('.table-wrapper:first-of-type [name]').forEach(field => {
+        producto[field.name] = field.value;
+    });
+    
+    // ---> ESTE ES EL CÓDIGO AÑADIDO <---
+    // Recoge todas las fechas de estabilidad (T0, T1, etc.) que tengan un nombre
+    form.querySelectorAll('input[type="date"][name]').forEach(field => {
+        // Asegura que solo se añadan las fechas que no son la de inicio (ya fue agregada)
+        if (field.name !== 'fecha_inicio' && field.value) {
+            producto[field.name] = field.value;
+        }
+    });
+
+    const resultados = [];
+    document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
+        const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
+        let analisisActual = '';
+        tabla.querySelectorAll('tbody tr').forEach(fila => {
+            const celdaAnalisis = fila.querySelector('td[data-analisis]');
+            if (celdaAnalisis) analisisActual = celdaAnalisis.dataset.analisis;
+
+            const celdaParametro = fila.querySelector('td[data-parametro]');
+            if (celdaParametro) {
+                const parametro_evaluado = celdaParametro.dataset.parametro;
+                const especificacionInput = fila.cells[3]?.querySelector('textarea, input');
+                const especificacion = especificacionInput ? especificacionInput.value : '';
+                
+                fila.querySelectorAll('select[data-tiempo], input[data-tiempo]').forEach(input => {
+                    if (input.value && input.value.trim() !== '') {
+                        resultados.push({
+                            tipo_estabilidad,
+                            analisis: analisisActual,
+                            parametro_evaluado,
+                            tiempo: input.dataset.tiempo,
+                            especificacion,
+                            resultado: input.value
+                        });
+                    }
+                });
+            }
+        });
+    });
+    
+    const payload = { ...producto, resultados };
+    const loteInput = document.getElementById('lote-principal');
+    const esModoEdicion = loteInput.readOnly;
+    let url = 'http://localhost:3000/api/productos';
+    let method = 'POST';
+    if (esModoEdicion) {
+        url = `http://localhost:3000/api/productos/${loteInput.value}`;
+        method = 'PUT';
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Error del servidor');
+        alert(data.message);
+        window.location.href = 'seguimiento.html';
+    } catch (error) {
+        console.error('Error al guardar:', error);
+        alert(`No se pudo guardar: ${error.message}`);
+    }
+}
 
     function autoResize(el) {
         el.style.height = 'auto';

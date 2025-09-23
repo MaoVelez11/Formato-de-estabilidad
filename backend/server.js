@@ -10,6 +10,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// Mensaje espía para ver todas las solicitudes (útil para depurar)
+app.use((req, res, next) => {
+    console.log(`--> Solicitud recibida: ${req.method} ${req.url}`);
+    next();
+});
+
 // 3. CONEXIÓN A LA BASE DE DATOS
 const pool = mysql.createPool({
     host: 'localhost',
@@ -20,14 +26,14 @@ const pool = mysql.createPool({
 
 // ------------------- RUTAS DE LA API (ENDPOINTS) -------------------
 
-// CREATE: Insertar un nuevo producto. El consecutivo es generado por la DB.
+// CREATE: Insertar un nuevo producto. (ESTA RUTA FALTABA)
 app.post('/api/productos', async (req, res) => {
+    console.log("✅ Éxito: Se ha entrado en la ruta POST /api/productos");
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
         const { resultados, ...producto } = req.body;
 
-        // Ya no manejamos el consecutivo aquí, la base de datos lo hace solo.
         const [result] = await connection.query("INSERT INTO productos_estabilidad SET ?", producto);
         
         if (resultados && resultados.length > 0) {
@@ -37,44 +43,11 @@ app.post('/api/productos', async (req, res) => {
         }
         
         await connection.commit();
-        res.status(201).json({ message: "Producto agregado con éxito", id: result.insertId });
-    } catch (error) {
-        await connection.rollback();
-        console.error("Error al crear producto:", error);
-        res.status(500).json({ message: "Error al crear el producto", error: error.message });
-    } finally {
-        connection.release();
-    }
-});
-
-// READ (Todos): Obtener todos los productos ordenados por el nuevo consecutivo
-// UBICA ESTA FUNCIÓN EN TU ARCHIVO server.js
-app.post('/api/productos', async (req, res) => {
-    const connection = await pool.getConnection();
-    try {
-        await connection.beginTransaction();
-        const { resultados, ...producto } = req.body;
-
-        const [result] = await connection.query("INSERT INTO productos_estabilidad SET ?", producto);
-        
-        // ... (el resto de tu código para guardar 'resultados' no cambia) ...
-        if (resultados && resultados.length > 0) {
-            const sqlResultados = "INSERT INTO resultados_analisis (producto_lote, tipo_estabilidad, analisis, parametro_evaluado, tiempo, especificacion, resultado) VALUES ?";
-            const valuesResultados = resultados.map(r => [ producto.lote, r.tipo_estabilidad, r.analisis, r.parametro_evaluado, r.tiempo, r.especificacion, r.resultado ]);
-            await connection.query(sqlResultados, [valuesResultados]);
-        }
-        
-        await connection.commit();
-
-        // ---- ¡CAMBIO CLAVE AQUÍ! ----
-        // Añadimos el 'consecutivo' a la respuesta JSON usando result.insertId
         res.status(201).json({ 
             message: "Producto agregado con éxito", 
-            consecutivo: result.insertId // <-- Esta es la línea importante
+            consecutivo: result.insertId 
         });
-        
     } catch (error) {
-        // ... (tu manejo de errores no cambia) ...
         await connection.rollback();
         console.error("Error al crear producto:", error);
         res.status(500).json({ message: "Error al crear el producto", error: error.message });
@@ -83,13 +56,25 @@ app.post('/api/productos', async (req, res) => {
     }
 });
 
-// READ (Búsqueda): Obtener productos filtrados, también ordenados por consecutivo
+// READ (Todos): Obtener todos los productos ordenados por consecutivo
+app.get('/api/productos', async (req, res) => {
+    try {
+        const sql = "SELECT * FROM productos_estabilidad ORDER BY consecutivo ASC";
+        const [rows] = await pool.query(sql);
+        res.json(rows);
+    } catch (error) {
+        console.error("Error al obtener todos los productos:", error);
+        res.status(500).json({ message: "Error al obtener los productos", error: error.message });
+    }
+});
+
+// READ (Búsqueda): Obtener productos filtrados (VERSIÓN CORREGIDA)
 app.get('/api/productos/buscar', async (req, res) => {
     try {
         const { termino } = req.query;
-        // CAMBIO CLAVE: Ordenamos por 'consecutivo'
         if (!termino || termino.trim() === '') {
             const sql = "SELECT * FROM productos_estabilidad ORDER BY consecutivo ASC";
+            const [allRows] = await pool.query(sql);
             return res.json(allRows);
         }
         const searchTerm = `%${termino}%`;
@@ -130,18 +115,15 @@ app.put('/api/productos/:lote', async (req, res) => {
         await connection.beginTransaction();
         const { lote } = req.params;
         const { resultados, ...producto } = req.body;
-
         const camposParaActualizar = {};
         for (const key in producto) {
             if (producto[key] !== null && producto[key] !== undefined && producto[key] !== '') {
                 camposParaActualizar[key] = producto[key];
             }
         }
-
         if (Object.keys(camposParaActualizar).length > 0) {
             await connection.query("UPDATE productos_estabilidad SET ? WHERE lote = ?", [camposParaActualizar, lote]);
         }
-        
         if (resultados) {
             await connection.query("DELETE FROM resultados_analisis WHERE producto_lote = ?", [lote]);
             if (resultados.length > 0) {
@@ -150,7 +132,6 @@ app.put('/api/productos/:lote', async (req, res) => {
                 await connection.query(sqlResultados, [valuesResultados]);
             }
         }
-
         await connection.commit();
         res.json({ message: "Producto actualizado con éxito" });
     } catch (error) {
