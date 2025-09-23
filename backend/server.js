@@ -13,27 +13,31 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 // 3. CONEXIÓN A LA BASE DE DATOS
 const pool = mysql.createPool({
     host: 'localhost',
-    user: 'samara_user',
-    password: 'Samara.2025',
+    user: 'root',
+    password: '1109',
     database: 'samara_cosmetics'
 });
 
 // ------------------- RUTAS DE LA API (ENDPOINTS) -------------------
 
-// CREATE: Insertar un nuevo producto y todos sus resultados
+// CREATE: Insertar un nuevo producto. El consecutivo es generado por la DB.
 app.post('/api/productos', async (req, res) => {
     const connection = await pool.getConnection();
     try {
         await connection.beginTransaction();
         const { resultados, ...producto } = req.body;
-        await connection.query("INSERT INTO productos_estabilidad SET ?", producto);
+
+        // Ya no manejamos el consecutivo aquí, la base de datos lo hace solo.
+        const [result] = await connection.query("INSERT INTO productos_estabilidad SET ?", producto);
+        
         if (resultados && resultados.length > 0) {
             const sqlResultados = "INSERT INTO resultados_analisis (producto_lote, tipo_estabilidad, analisis, parametro_evaluado, tiempo, especificacion, resultado) VALUES ?";
             const valuesResultados = resultados.map(r => [ producto.lote, r.tipo_estabilidad, r.analisis, r.parametro_evaluado, r.tiempo, r.especificacion, r.resultado ]);
             await connection.query(sqlResultados, [valuesResultados]);
         }
+        
         await connection.commit();
-        res.status(201).json({ message: "Producto agregado con éxito" });
+        res.status(201).json({ message: "Producto agregado con éxito", id: result.insertId });
     } catch (error) {
         await connection.rollback();
         console.error("Error al crear producto:", error);
@@ -43,31 +47,56 @@ app.post('/api/productos', async (req, res) => {
     }
 });
 
-// READ (Todos): Obtener todos los productos
-app.get('/api/productos', async (req, res) => {
+// READ (Todos): Obtener todos los productos ordenados por el nuevo consecutivo
+// UBICA ESTA FUNCIÓN EN TU ARCHIVO server.js
+app.post('/api/productos', async (req, res) => {
+    const connection = await pool.getConnection();
     try {
-        const sql = "SELECT * FROM productos_estabilidad ORDER BY creado_en DESC";
-        const [rows] = await pool.query(sql);
-        res.json(rows);
+        await connection.beginTransaction();
+        const { resultados, ...producto } = req.body;
+
+        const [result] = await connection.query("INSERT INTO productos_estabilidad SET ?", producto);
+        
+        // ... (el resto de tu código para guardar 'resultados' no cambia) ...
+        if (resultados && resultados.length > 0) {
+            const sqlResultados = "INSERT INTO resultados_analisis (producto_lote, tipo_estabilidad, analisis, parametro_evaluado, tiempo, especificacion, resultado) VALUES ?";
+            const valuesResultados = resultados.map(r => [ producto.lote, r.tipo_estabilidad, r.analisis, r.parametro_evaluado, r.tiempo, r.especificacion, r.resultado ]);
+            await connection.query(sqlResultados, [valuesResultados]);
+        }
+        
+        await connection.commit();
+
+        // ---- ¡CAMBIO CLAVE AQUÍ! ----
+        // Añadimos el 'consecutivo' a la respuesta JSON usando result.insertId
+        res.status(201).json({ 
+            message: "Producto agregado con éxito", 
+            consecutivo: result.insertId // <-- Esta es la línea importante
+        });
+        
     } catch (error) {
-        console.error("Error al obtener productos:", error);
-        res.status(500).json({ message: "Error al obtener los productos", error: error.message });
+        // ... (tu manejo de errores no cambia) ...
+        await connection.rollback();
+        console.error("Error al crear producto:", error);
+        res.status(500).json({ message: "Error al crear el producto", error: error.message });
+    } finally {
+        connection.release();
     }
 });
 
-// READ (Búsqueda): Obtener productos filtrados
+// READ (Búsqueda): Obtener productos filtrados, también ordenados por consecutivo
 app.get('/api/productos/buscar', async (req, res) => {
     try {
         const { termino } = req.query;
+        // CAMBIO CLAVE: Ordenamos por 'consecutivo'
         if (!termino || termino.trim() === '') {
-            const [allRows] = await pool.query("SELECT * FROM productos_estabilidad ORDER BY creado_en DESC");
+            const sql = "SELECT * FROM productos_estabilidad ORDER BY consecutivo ASC";
             return res.json(allRows);
         }
         const searchTerm = `%${termino}%`;
         const sql = `
             SELECT * FROM productos_estabilidad 
             WHERE producto LIKE ? OR lote LIKE ? OR referencia LIKE ?
-            ORDER BY creado_en DESC
+            ORDER BY consecutivo ASC
         `;
         const [rows] = await pool.query(sql, [searchTerm, searchTerm, searchTerm]);
         res.json(rows);
@@ -94,7 +123,7 @@ app.get('/api/productos/:lote', async (req, res) => {
     }
 });
 
-// UPDATE: Actualizar un producto existente (versión mejorada que no borra datos)
+// UPDATE: Actualizar un producto existente
 app.put('/api/productos/:lote', async (req, res) => {
     const connection = await pool.getConnection();
     try {
@@ -102,21 +131,17 @@ app.put('/api/productos/:lote', async (req, res) => {
         const { lote } = req.params;
         const { resultados, ...producto } = req.body;
 
-        // Filtra los campos para no actualizar con valores vacíos o nulos
         const camposParaActualizar = {};
         for (const key in producto) {
-            // ¡ESTA ES LA LÍNEA CLAVE! Solo incluye campos que no sean nulos, indefinidos O vacíos.
             if (producto[key] !== null && producto[key] !== undefined && producto[key] !== '') {
                 camposParaActualizar[key] = producto[key];
             }
         }
 
-        // Solo ejecuta el UPDATE si hay al menos un campo con datos para actualizar
         if (Object.keys(camposParaActualizar).length > 0) {
             await connection.query("UPDATE productos_estabilidad SET ? WHERE lote = ?", [camposParaActualizar, lote]);
         }
         
-        // La lógica para actualizar los 'resultados' (si vienen del otro formulario) se mantiene
         if (resultados) {
             await connection.query("DELETE FROM resultados_analisis WHERE producto_lote = ?", [lote]);
             if (resultados.length > 0) {
@@ -137,7 +162,7 @@ app.put('/api/productos/:lote', async (req, res) => {
     }
 });
 
-// DELETE: Eliminar un producto (los resultados se borran en cascada)
+// DELETE: Eliminar un producto
 app.delete('/api/productos/:lote', async (req, res) => {
     try {
         const { lote } = req.params;
