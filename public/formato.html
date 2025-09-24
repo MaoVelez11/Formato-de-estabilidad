@@ -545,9 +545,53 @@ header {
         </form>
 
         <button type="button" class="btn" style="background-color: #65b45a" onclick="guardarFormulario()">💾 Guardar Producto</button>
+
+<button type="button" class="btn" style="background-color: #c82333;" onclick="cerrarProducto()">🔐 Cerrar producto completado</button>
     </div>
 
     <script>
+        // AÑADE ESTA NUEVA FUNCIÓN EN EL <script> DE formato.html
+
+async function cerrarProducto() {
+    const form = document.getElementById('formato-completo');
+    const loteInput = document.getElementById('lote-principal');
+    const lote = loteInput.value;
+
+    // 1. Validación previa
+    if (!form.checkValidity()) {
+        alert("⚠️ Faltan campos obligatorios por completar. No se puede cerrar el producto.");
+        return;
+    }
+    if (!lote) {
+        alert("No se ha podido identificar el lote del producto a cerrar.");
+        return;
+    }
+
+    // 2. Mensaje de confirmación
+    const confirmacion = confirm("⚠️ ¿Está seguro de que desea cerrar este producto? Una vez cerrado, no podrá ser modificado nuevamente.");
+
+    if (confirmacion) {
+        // 3. Al aceptar el cierre
+        try {
+            const response = await fetch(`/api/productos/${lote}/cerrar`, {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error del servidor');
+            }
+
+            alert(`✅ ${data.message}`);
+            window.location.href = 'seguimiento.html'; // Redirige al módulo principal
+
+        } catch (error) {
+            console.error('Error al intentar cerrar el producto:', error);
+            alert(`No se pudo cerrar el producto: ${error.message}`);
+        }
+    }
+}
       // --- NUEVA FUNCIÓN AUXILIAR PARA AÑADIR MESES A UNA FECHA ---
 function addMonths(dateString, months) {
     if (!dateString) return '';

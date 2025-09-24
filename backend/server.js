@@ -55,11 +55,29 @@ app.post('/api/productos', async (req, res) => {
         connection.release();
     }
 });
+// Asegúrate de que esta ruta exista en tu server.js
+app.post('/api/productos/:lote/cerrar', async (req, res) => {
+    try {
+        const { lote } = req.params;
+        const sql = "UPDATE productos_estabilidad SET cerrado = TRUE WHERE lote = ?";
+        const [result] = await pool.query(sql, [lote]);
 
-// READ (Todos): Obtener todos los productos ordenados por consecutivo
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Producto no encontrado" });
+        }
+        res.json({ message: "Producto cerrado con éxito. Ya no podrá ser modificado." });
+    } catch (error) {
+        console.error("Error al cerrar el producto:", error);
+        res.status(500).json({ message: "Error en el servidor al cerrar el producto" });
+    }
+});
+
+// MODIFICA ESTA RUTA EN server.js
+
 app.get('/api/productos', async (req, res) => {
     try {
-        const sql = "SELECT * FROM productos_estabilidad ORDER BY consecutivo ASC";
+        // MODIFICACIÓN: Añadido "WHERE cerrado = FALSE" para ocultar los completados
+        const sql = "SELECT * FROM productos_estabilidad WHERE cerrado = FALSE ORDER BY consecutivo ASC";
         const [rows] = await pool.query(sql);
         res.json(rows);
     } catch (error) {

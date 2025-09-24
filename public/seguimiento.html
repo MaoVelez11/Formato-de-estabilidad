@@ -180,18 +180,27 @@ async function realizarBusqueda() {
     baseDate.setMonth(baseDate.getMonth() + months);
     return baseDate.toISOString().split('T')[0];
 }
+// En tu <script> de seguimiento.html, reemplaza esta función:
+
 function actualizarFechasFila(inputT0) {
     const fila = inputT0.closest('tr');
     const fechaInicio = inputT0.value;
 
-    // Actualiza las fechas SOLO en la fila que se está editando
+    // Actualiza las fechas de Estabilidad Acelerada en la fila
     fila.querySelector('[name="acelerada_t1"]').value = addMonths(fechaInicio, 1);
     fila.querySelector('[name="acelerada_t2"]').value = addMonths(fechaInicio, 2);
     fila.querySelector('[name="acelerada_t3"]').value = addMonths(fechaInicio, 3);
+
+    // Actualiza las fechas de Estabilidad Natural en la fila
     fila.querySelector('[name="natural_t3"]').value = addMonths(fechaInicio, 3);
     fila.querySelector('[name="natural_t6"]').value = addMonths(fechaInicio, 6);
+    fila.querySelector('[name="natural_t9"]').value = addMonths(fechaInicio, 9);
     fila.querySelector('[name="natural_t12"]').value = addMonths(fechaInicio, 12);
+    fila.querySelector('[name="natural_t18"]').value = addMonths(fechaInicio, 18);
     fila.querySelector('[name="natural_t24"]').value = addMonths(fechaInicio, 24);
+    fila.querySelector('[name="natural_t27"]').value = addMonths(fechaInicio, 27);
+    fila.querySelector('[name="natural_t30"]').value = addMonths(fechaInicio, 30);
+    fila.querySelector('[name="natural_t33"]').value = addMonths(fechaInicio, 33);
     fila.querySelector('[name="natural_t36"]').value = addMonths(fechaInicio, 36);
 }
 
