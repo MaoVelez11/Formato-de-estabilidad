@@ -39,16 +39,23 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
 }
 
 /* Contenedor principal que usa Flexbox para alinear las 5 tablas */
+/* Reemplaza el estilo anterior con este */
 .container-corrected {
     display: flex;
-    flex-wrap: wrap; /* Permite que las cajas bajen si no caben en la pantalla */
-    gap: 15px; /* Espacio entre cada caja */
-    justify-content: center; /* Centra las cajas en el contenedor */
+    flex-direction: column; /* Apila las filas verticalmente */
+    gap: 15px;
     border: 1px solid #ccc;
-    border-top: none; /* Une el borde con el título de arriba */
+    border-top: none;
     padding: 15px;
     margin-bottom: 25px;
     background-color: #fff;
+}
+
+/* Y añade esta nueva clase */
+.param-row {
+    display: flex;
+    gap: 15px;
+    width: 100%;
 }
 
 /* Estilo para cada una de las 5 cajas de parámetros */
@@ -394,97 +401,102 @@ header {
     </table>
 </div>
 
-            <h2 class="section-title-corrected">Parámetros Específicos</h2>
+           <h2 class="section-title-corrected">Parámetros Específicos</h2>
 <div class="container-corrected">
-    <div class="param-box-corrected" style="flex: initial;">
-        <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="pH">
-            <thead>
-                <tr><th colspan="2">Estabilidad Acelerada</th></tr>
-                <tr><th>Tiempo</th><th>pH</th></tr>
-            </thead>
-            <tbody>
-                <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
-                <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
-                <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
-                <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
-            </tbody>
-        </table>
+
+    <div class="param-row">
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="pH">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Acelerada</th></tr>
+                    <tr><th>Tiempo</th><th>pH</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
+                    <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
+                    <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Acelerada</th></tr>
+                    <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
+                    <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
+                    <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="param-box-corrected" style="flex: initial;">
-        <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
-            <thead>
-                <tr><th colspan="2">Estabilidad Acelerada</th></tr>
-                <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
-            </thead>
-            <tbody>
-                <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
-                <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
-                <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
-                <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
-            </tbody>
-        </table>
+    <div class="param-row">
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="pH">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>pH</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Viscosidad">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>Viscosidad</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div class="param-box-corrected" style="flex: initial;">
-        <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="pH">
-            <thead>
-                <tr><th colspan="2">Estabilidad Natural</th></tr>
-                <tr><th>Tiempo</th><th>pH</th></tr>
-            </thead>
-            <tbody>
-                <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
-                <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
-                <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
-                <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
-                <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
-                <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
-                <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
-                <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
-                <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
-                <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
-            </tbody>
-        </table>
     </div>
-    <div class="param-box-corrected" style="flex: initial;">
-        <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Viscosidad">
-            <thead>
-                <tr><th colspan="2">Estabilidad Natural</th></tr>
-                <tr><th>Tiempo</th><th>Viscosidad</th></tr>
-            </thead>
-            <tbody>
-                <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
-                <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
-                <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
-                <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
-                <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
-                <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
-                <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
-                <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
-                <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
-                <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="param-box-corrected" style="flex: initial;">
-        <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
-            <thead>
-                <tr><th colspan="2">Estabilidad Natural</th></tr>
-                <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
-            </thead>
-            <tbody>
-                <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
-                <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
-                <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
-                <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
-                <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
-                <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
-                <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
-                <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
-                <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
-                <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
             <h2>Microbiológicos</h2>
 <div class="table-wrapper micro-table">
     <table data-tipo-estabilidad="Natural" data-analisis="Microbiológico">
