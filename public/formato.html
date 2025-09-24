@@ -594,95 +594,194 @@ function actualizarFechasEstabilidad() {
     }
 });
 
-    async function cargarDatosDeProducto(lote) {
-        try {
-            const response = await fetch(`http://localhost:3000/api/productos/${lote}`);
-            if (!response.ok) throw new Error('Producto no encontrado');
-            const data = await response.json();
-            const { resultados, ...producto } = data;
-            for (const key in producto) {
-                const field = document.querySelector(`[name="${key}"]`);
-                if (field) field.value = producto[key] ? (field.type === 'date' ? producto[key].split('T')[0] : producto[key]) : '';
-            }
-            if (resultados) {
-                resultados.forEach(r => {
-                    const selector = `table[data-tipo-estabilidad="${r.tipo_estabilidad}"] td[data-parametro="${r.parametro_evaluado}"]`;
-                    const celdaParametro = document.querySelector(selector);
-                    if (celdaParametro) {
-                        const fila = celdaParametro.closest('tr');
-                        const inputResultado = fila.querySelector(`select[data-tiempo="${r.tiempo}"], input[data-tiempo="${r.tiempo}"]`);
-                        if(inputResultado) inputResultado.value = r.resultado;
-                        const inputEspecificacion = fila.cells[3]?.querySelector('textarea');
-                        if(inputEspecificacion) inputEspecificacion.value = r.especificacion;
-                    }
-                });
-            }
-            document.querySelectorAll('textarea').forEach(autoResize);
-        } catch (error) {
-            console.error('Error al cargar datos del producto:', error);
-            alert(error.message);
-        }
-    }
+    // En tu archivo formato.html, reemplaza tu función completa con esta:
 
-    async function guardarFormulario() {
+// En tu archivo formato.html, reemplaza tu función actual con esta versión definitiva:
+
+async function cargarDatosDeProducto(lote) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/productos/${lote}`);
+        if (!response.ok) throw new Error('Producto no encontrado');
+        
+        const data = await response.json();
+        const { resultados, ...producto } = data;
+
+        // 1. Rellena los campos de "Información General" y las fechas
+        for (const key in producto) {
+            const field = document.querySelector(`[name="${key}"]`);
+            if (field) {
+                field.value = producto[key] ? (field.type === 'date' ? producto[key].split('T')[0] : producto[key]) : '';
+            }
+        }
+
+        if (!resultados || resultados.length === 0) return;
+
+        // 2. Rellena las tablas de análisis principales (las que tienen los <select>)
+        document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
+            let analisisActual = '';
+            tabla.querySelectorAll('tbody tr').forEach(fila => {
+                const celdaAnalisis = fila.querySelector('td[data-analisis]');
+                if (celdaAnalisis) {
+                    analisisActual = celdaAnalisis.dataset.analisis;
+                }
+
+                const celdaParametro = fila.querySelector('td[data-parametro]');
+                if (celdaParametro) {
+                    const parametro_evaluado = celdaParametro.dataset.parametro;
+
+                    // Busca el primer resultado que coincida para obtener la especificación
+                    const resultadoParaFila = resultados.find(r => 
+                        r.analisis === analisisActual && 
+                        r.parametro_evaluado.startsWith(parametro_evaluado)
+                    );
+
+                    // Rellena la especificación usando la lógica de rowspan
+                    const especificacionCellIndex = celdaAnalisis ? 3 : 2;
+                    const inputEspecificacion = fila.cells[especificacionCellIndex]?.querySelector('textarea');
+                    if (inputEspecificacion && resultadoParaFila && resultadoParaFila.especificacion) {
+                        inputEspecificacion.value = resultadoParaFila.especificacion;
+                    }
+
+                    // Rellena cada <select> de la fila
+                    fila.querySelectorAll('select[data-tiempo]').forEach(select => {
+                        const tiempo = select.dataset.tiempo;
+                        const resultadoEspecifico = resultados.find(r => 
+                            r.analisis === analisisActual &&
+                            r.parametro_evaluado.startsWith(parametro_evaluado) &&
+                            r.tiempo === tiempo
+                        );
+                        if (resultadoEspecifico) {
+                            select.value = resultadoEspecifico.resultado;
+                        }
+                    });
+                }
+            });
+        });
+
+        // ---> PEGA ESTE NUEVO BLOQUE DE CÓDIGO AQUÍ <---
+       // REEMPLAZA EL BLOQUE 3 CON ESTO:
+
+    // 3. Rellena las tablas de Parámetros Específicos y Microbiológicos
+    resultados.forEach(r => {
+        // Selector para Parámetros Específicos
+        let selector = `.container-corrected table[data-tipo-estabilidad="${r.tipo_estabilidad}"][data-parametro="${r.parametro_evaluado}"] input[data-tiempo="${r.tiempo}"]`;
+        let campo = document.querySelector(selector);
+        
+        // Selector para Microbiológicos
+        if (!campo) {
+            selector = `.micro-table table[data-tipo-estabilidad="${r.tipo_estabilidad}"] input[data-parametro="${r.parametro_evaluado}"][data-tiempo="${r.tiempo}"]`;
+            campo = document.querySelector(selector);
+        }
+
+        if (campo) {
+            campo.value = r.resultado;
+        }
+    });
+        
+        // Ajusta la altura de los textarea después de llenarlos
+        document.querySelectorAll('textarea').forEach(autoResize);
+
+    } catch (error) {
+        console.error('Error al cargar datos del producto:', error);
+        alert(error.message);
+    }
+}
+
+
+async function guardarFormulario() {
     const form = document.getElementById('formato-completo');
     if (!form.checkValidity()) {
         alert("Por favor, complete los campos obligatorios.");
         return;
     }
 
+    // 1. Recopila los datos de "Información General" y las fechas (tu lógica original)
     const producto = {};
-    // Recoge los campos de la tabla "INFORMACIÓN GENERAL"
-    form.querySelectorAll('.table-wrapper:first-of-type [name]').forEach(field => {
-        producto[field.name] = field.value;
-    });
-    
-    // ---> ESTE ES EL CÓDIGO AÑADIDO <---
-    // Recoge todas las fechas de estabilidad (T0, T1, etc.) que tengan un nombre
-    form.querySelectorAll('input[type="date"][name]').forEach(field => {
-        // Asegura que solo se añadan las fechas que no son la de inicio (ya fue agregada)
-        if (field.name !== 'fecha_inicio' && field.value) {
+    form.querySelectorAll('.table-wrapper:first-of-type [name], input[type="date"][name]').forEach(field => {
+        if (field.value) {
             producto[field.name] = field.value;
         }
     });
 
     const resultados = [];
+
+    // 2. Recopila los resultados de las tablas PRINCIPALES (las que tienen los <select>)
     document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
         const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
         let analisisActual = '';
+
         tabla.querySelectorAll('tbody tr').forEach(fila => {
             const celdaAnalisis = fila.querySelector('td[data-analisis]');
-            if (celdaAnalisis) analisisActual = celdaAnalisis.dataset.analisis;
+            if (celdaAnalisis) {
+                analisisActual = celdaAnalisis.dataset.analisis;
+            }
 
             const celdaParametro = fila.querySelector('td[data-parametro]');
             if (celdaParametro) {
                 const parametro_evaluado = celdaParametro.dataset.parametro;
-                const especificacionInput = fila.cells[3]?.querySelector('textarea, input');
-                const especificacion = especificacionInput ? especificacionInput.value : '';
                 
-                fila.querySelectorAll('select[data-tiempo], input[data-tiempo]').forEach(input => {
-                    if (input.value && input.value.trim() !== '') {
+                // Lógica corregida para encontrar la celda de "Especific." manejando rowspan
+                const especificacionCellIndex = celdaAnalisis ? 3 : 2;
+                const especificacion = fila.cells[especificacionCellIndex]?.querySelector('textarea')?.value || '';
+
+                // Itera por las celdas restantes para obtener los resultados de los <select>
+                const inicioCeldasResultado = especificacionCellIndex + 1;
+                for (let i = inicioCeldasResultado; i < fila.cells.length; i++) {
+                    const select = fila.cells[i]?.querySelector('select[data-tiempo]');
+                    if (select && select.value) {
                         resultados.push({
                             tipo_estabilidad,
                             analisis: analisisActual,
                             parametro_evaluado,
-                            tiempo: input.dataset.tiempo,
-                            especificacion,
-                            resultado: input.value
+                            tiempo: select.dataset.tiempo,
+                            especificacion, // Se guarda la especificación correcta para cada resultado
+                            resultado: select.value
                         });
                     }
-                });
+                }
             }
         });
     });
+    // ... fin del primer bucle 'resultados.push'
+    // ---> PEGA ESTE NUEVO BLOQUE DE CÓDIGO AQUÍ <---
+    // REEMPLAZA EL BLOQUE 3 CON ESTO:
+
+    // 3. Recopila los resultados de "Parámetros Específicos" y "Microbiológicos"
+    document.querySelectorAll('.container-corrected table, .micro-table table').forEach(tabla => {
+        const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
+        const analisis = tabla.dataset.analisis;
+        
+        // Bucle para Parámetros Específicos
+        if (tabla.closest('.container-corrected')) {
+            const parametro = tabla.dataset.parametro;
+            tabla.querySelectorAll('tbody input[data-tiempo]').forEach(input => {
+                if (input.value) {
+                    resultados.push({ tipo_estabilidad, analisis, parametro_evaluado: parametro, tiempo: input.dataset.tiempo, especificacion: '', resultado: input.value });
+                }
+            });
+        }
+        // Bucle específico para Microbiológicos
+        else if (tabla.closest('.micro-table')) {
+            tabla.querySelectorAll('tbody input[data-tiempo][data-parametro]').forEach(input => {
+                if (input.value) {
+                    resultados.push({ tipo_estabilidad, analisis, parametro_evaluado: input.dataset.parametro, tiempo: input.dataset.tiempo, especificacion: '', resultado: input.value });
+                }
+            });
+        }
+    });
+
     
+    // ... el resto de tu función continúa igual
+    
+    // 4. Unifica todo y envía al servidor (tu lógica original)
     const payload = { ...producto, resultados };
     const loteInput = document.getElementById('lote-principal');
     const esModoEdicion = loteInput.readOnly;
-    let url = 'http://localhost:3000/api/productos';
+    let url = '/api/productos';
     let method = 'POST';
+
     if (esModoEdicion) {
-        url = `http://localhost:3000/api/productos/${loteInput.value}`;
+        url = `/api/productos/${loteInput.value}`;
         method = 'PUT';
     }
 

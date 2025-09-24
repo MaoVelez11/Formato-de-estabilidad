@@ -97,6 +97,9 @@
                 // DESPUÉS:
                 const nuevaFila = tbody.insertRow(-1);
                 // En la función renderizarTabla de seguimiento.html, reemplaza tu innerHTML con este:
+// Reemplaza tu innerHTML con esta versión verificada
+// En tu función renderizarTabla, reemplaza ÚNICAMENTE el bloque de innerHTML:
+
 nuevaFila.innerHTML = `
     <td><input type="checkbox" /></td>
     <td class="consec">${productoConFechas.consecutivo}</td>
@@ -105,7 +108,7 @@ nuevaFila.innerHTML = `
     <td><input type="text" name="nso" class="campo" value="${productoConFechas.nso || ''}" /></td>
     <td><input type="text" name="lote" class="campo" value="${productoConFechas.lote || ''}" readonly style="background-color:#eee;" /></td>
     <td><textarea name="descripcion" class="campo">${productoConFechas.descripcion || ''}</textarea></td>
-    <td><textarea name="pruebas" class="pruebas">${productoConFechas.pruebas || 'Apariencia, color, pH, Densidad, Viscosidad, Aplicación, microbiología'}</textarea></td>
+    <td><textarea name="pruebas" class="pruebas">${productoConFechas.pruebas || ''}</textarea></td>
     <td><textarea name="observaciones">${productoConFechas.observaciones || ''}</textarea></td>
     <td><input type="number" name="total_unidades" min="0" value="${productoConFechas.total_unidades || '0'}" class="total-unidades" readonly /></td>
     
@@ -131,9 +134,12 @@ nuevaFila.innerHTML = `
     
     <td><input type="radio" name="aprob${productoConFechas.consecutivo}" value="Sin Fecha Exp." ${productoConFechas.aprobacion === 'Sin Fecha Exp.' ? 'checked' : ''} /></td>
     <td><input type="radio" name="aprob${productoConFechas.consecutivo}" value="Con Fecha Exp." ${productoConFechas.aprobacion === 'Con Fecha Exp.' ? 'checked' : ''} /></td>
+    
     <td><input type="number" name="tiempo_exp_meses" min="0" value="${productoConFechas.tiempo_exp_meses || ''}" /></td>
+
     <td><input type="radio" name="estad${productoConFechas.consecutivo}" value="si" ${productoConFechas.estadisticos === 'si' ? 'checked' : ''} /></td>
     <td><input type="radio" name="estad${productoConFechas.consecutivo}" value="no" ${productoConFechas.estadisticos === 'no' ? 'checked' : ''} /></td>
+
     <td><textarea name="comentarios">${productoConFechas.comentarios || ''}</textarea></td>
     <td><button class="btn" style="padding: 6px 12px; font-size: 12px" onclick="editarProducto(this, ${productoConFechas.consecutivo})">Acceder / Editar</button></td>
 `;
