@@ -96,7 +96,7 @@
                 const productoConFechas = calcularYAsignarFechas(producto);
                 // DESPUÉS:
                 const nuevaFila = tbody.insertRow(-1);
-                // En la función renderizarTabla de seguimiento.html, reemplaza tu innerHTML con este:
+                
 
 
 nuevaFila.innerHTML = `
@@ -179,7 +179,7 @@ async function realizarBusqueda() {
     baseDate.setMonth(baseDate.getMonth() + months);
     return baseDate.toISOString().split('T')[0];
 }
-// En tu <script> de seguimiento.html, reemplaza esta función:
+
 
 function actualizarFechasFila(inputT0) {
     const fila = inputT0.closest('tr');

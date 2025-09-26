@@ -21,7 +21,7 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
 .btn:hover { background: #e06d4a; }
 .table-wrapper { overflow-x: auto; }
 
-/* --- ESTILOS CORREGIDOS PARA PARÁMETROS ESPECÍFICOS --- */
+/* --- ESTILOS PARA PARÁMETROS ESPECÍFICOS --- */
 
 /* Título de la sección que simula la barra superior de la imagen */
 .section-title-corrected {
@@ -39,7 +39,7 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
 }
 
 /* Contenedor principal que usa Flexbox para alinear las 5 tablas */
-/* Reemplaza el estilo anterior con este */
+
 .container-corrected {
     display: flex;
     flex-direction: column; /* Apila las filas verticalmente */
@@ -51,7 +51,7 @@ td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
     background-color: #fff;
 }
 
-/* Y añade esta nueva clase */
+
 .param-row {
     display: flex;
     gap: 15px;
@@ -420,7 +420,7 @@ header {
                 </tbody>
             </table>
         </div>
-        <!-- Pega este bloque completo dentro de tu primer div class="param-row" -->
+        
 
 <div class="param-box-corrected">
     <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="Viscosidad">
@@ -579,7 +579,7 @@ header {
     </div>
 
     <script>
-        // AÑADE ESTA NUEVA FUNCIÓN EN EL <script> DE formato.html
+        
 
 async function cerrarProducto() {
     const form = document.getElementById('formato-completo');
@@ -621,7 +621,7 @@ async function cerrarProducto() {
         }
     }
 }
-      // --- NUEVA FUNCIÓN AUXILIAR PARA AÑADIR MESES A UNA FECHA ---
+      // ---  FUNCIÓN AUXILIAR PARA AÑADIR MESES A UNA FECHA ---
 function addMonths(dateString, months) {
     if (!dateString) return '';
     const baseDate = new Date(dateString + 'T00:00:00');
@@ -629,7 +629,7 @@ function addMonths(dateString, months) {
     return baseDate.toISOString().split('T')[0];
 }
 
-// --- NUEVA FUNCIÓN PRINCIPAL PARA CALCULAR Y ASIGNAR TODAS LAS FECHAS ---
+// ---  FUNCIÓN PRINCIPAL PARA CALCULAR Y ASIGNAR TODAS LAS FECHAS ---
 function actualizarFechasEstabilidad() {
     const fechaInicio = document.querySelector('[name="fecha_inicio"]').value;
 
@@ -650,7 +650,7 @@ function actualizarFechasEstabilidad() {
     document.querySelector('[name="natural_t36"]').value = addMonths(fechaInicio, 36);
 }
     document.addEventListener('DOMContentLoaded', () => {
-    // ... tu código existente para autoResize ...
+    // ...  código existente para autoResize ...
     document.querySelector('[name="fecha_inicio"]').addEventListener('change', actualizarFechasEstabilidad);
     const urlParams = new URLSearchParams(window.location.search);
     const lote = urlParams.get('lote');
@@ -667,9 +667,7 @@ function actualizarFechasEstabilidad() {
     }
 });
 
-    // En tu archivo formato.html, reemplaza tu función completa con esta:
-
-// En tu archivo formato.html, reemplaza tu función actual con esta versión definitiva:
+    
 
 async function cargarDatosDeProducto(lote) {
     try {
@@ -731,8 +729,7 @@ async function cargarDatosDeProducto(lote) {
             });
         });
 
-        // ---> PEGA ESTE NUEVO BLOQUE DE CÓDIGO AQUÍ <---
-       // REEMPLAZA EL BLOQUE 3 CON ESTO:
+        
 
     // 3. Rellena las tablas de Parámetros Específicos y Microbiológicos
     resultados.forEach(r => {
@@ -816,8 +813,7 @@ async function guardarFormulario() {
         });
     });
     // ... fin del primer bucle 'resultados.push'
-    // ---> PEGA ESTE NUEVO BLOQUE DE CÓDIGO AQUÍ <---
-    // REEMPLAZA EL BLOQUE 3 CON ESTO:
+    
 
     // 3. Recopila los resultados de "Parámetros Específicos" y "Microbiológicos"
     document.querySelectorAll('.container-corrected table, .micro-table table').forEach(tabla => {
@@ -843,8 +839,8 @@ async function guardarFormulario() {
         }
     });
 
-    
-    // ... el resto de tu función continúa igual
+
+
     
     // 4. Unifica todo y envía al servidor (tu lógica original)
     const payload = { ...producto, resultados };

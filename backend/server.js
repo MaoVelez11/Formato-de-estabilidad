@@ -26,7 +26,7 @@ const pool = mysql.createPool({
 
 // ------------------- RUTAS DE LA API (ENDPOINTS) -------------------
 
-// CREATE: Insertar un nuevo producto. (ESTA RUTA FALTABA)
+// CREATE: Insertar un nuevo producto. 
 app.post('/api/productos', async (req, res) => {
     console.log("✅ Éxito: Se ha entrado en la ruta POST /api/productos");
     const connection = await pool.getConnection();
@@ -55,7 +55,7 @@ app.post('/api/productos', async (req, res) => {
         connection.release();
     }
 });
-// Asegúrate de que esta ruta exista en tu server.js
+
 app.post('/api/productos/:lote/cerrar', async (req, res) => {
     try {
         const { lote } = req.params;
@@ -72,7 +72,7 @@ app.post('/api/productos/:lote/cerrar', async (req, res) => {
     }
 });
 
-// MODIFICA ESTA RUTA EN server.js
+
 
 app.get('/api/productos', async (req, res) => {
     try {
@@ -86,7 +86,7 @@ app.get('/api/productos', async (req, res) => {
     }
 });
 
-// READ (Búsqueda): Obtener productos filtrados (VERSIÓN CORREGIDA)
+// READ (Búsqueda): Obtener productos filtrados 
 app.get('/api/productos/buscar', async (req, res) => {
     try {
         const { termino } = req.query;
