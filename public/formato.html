@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Formato Completo de Estabilidad</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* --- ESTILOS GENERALES DEL FORMULARIO --- */
+body { font-family: Arial, sans-serif; background: #fdfdfd; color: #333; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+header { display: flex; align-items: center; justify-content: space-between; gap: 15px; margin-bottom: 20px; border-bottom: 3px solid #e6b8af; padding-bottom: 15px; }
+header img { height: 50px; }
+header h1 { color: #6a4f6d; font-size: 22px; margin: 0; }
+h2 { background: #e6b8af; padding: 10px; text-align: center; font-size: 18px; color: #fff; border-radius: 5px; margin-top: 30px;}
+table { border-collapse: collapse; margin-bottom: 20px; width: 100%; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+th, td { border: 1px solid #ccc; padding: 8px; text-align: left; vertical-align: middle; }
+td.label { background-color: #f8f8f8; font-weight: bold; width: 25%; }
+input[type='text'], input[type='date'], select, textarea { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+td textarea { min-height: 40px; resize: vertical; line-height: 1.5; }
+.btn { padding: 10px 20px; background: #f37f58; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+.btn:hover { background: #e06d4a; }
+.table-wrapper { overflow-x: auto; }
+
+/* --- ESTILOS PARA PARÁMETROS ESPECÍFICOS --- */
+
+/* Título de la sección que simula la barra superior de la imagen */
+.section-title-corrected {
+    background-color: #E6B8AF;
+    color: #333;
+    padding: 10px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-bottom: none;
+    margin-top: 30px;
+    margin-bottom: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+/* Contenedor principal que usa Flexbox para alinear las 5 tablas */
+
+.container-corrected {
+    display: flex;
+    flex-direction: column; /* Apila las filas verticalmente */
+    gap: 15px;
+    border: 1px solid #ccc;
+    border-top: none;
+    padding: 15px;
+    margin-bottom: 25px;
+    background-color: #fff;
+}
+
+
+.param-row {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+/* Estilo para cada una de las 5 cajas de parámetros */
+.param-box-corrected {
+    flex: 1; /* Permite que las cajas crezcan para ocupar el espacio */
+    min-width: 210px; /* Ancho mínimo antes de que se pasen a la siguiente línea */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    overflow: hidden; /* Asegura que los bordes redondeados se apliquen a la tabla */
+}
+
+.param-box-corrected table {
+    margin: 0;
+    box-shadow: none;
+    border: none;
+}
+
+/* Estilos para los encabezados de las tablas de parámetros */
+.param-box-corrected th {
+    background-color: #E6B8AF;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+.param-box-corrected thead tr:last-child th {
+    background-color: #f8f8f8;
+    color: #333;
+}
+
+/* Estilos para las celdas de Tiempo y Valor */
+.param-box-corrected .time-cell {
+    width: 40%;
+    text-align: center;
+    background-color: #f8f8f8;
+    font-weight: bold;
+}
+.param-box-corrected .value-cell {
+    padding: 0;
+}
+.param-box-corrected .value-cell input {
+    width: 100%;
+    border: none;
+    padding: 8px;
+    box-sizing: border-box;
+    text-align: center;
+    background-color: transparent;
+    border-radius: 0;
+}
+.param-box-corrected .value-cell input:focus {
+    outline: 1px solid #a0a0ff;
+}
+/* --- ESTILOS PARA EL VISUALIZADOR DE CONSECUTIVO --- */
+#consecutivo-display {
+    position: absolute;
+    top: 20px;
+    right: 250px; /* Ajusta este valor si es necesario */
+    background-color: #6a4f6d;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+#consecutivo-display span {
+    display: block;
+    font-size: 11px;
+    opacity: 0.8;
+    line-height: 1;
+}
+#consecutivo-display strong {
+    font-size: 24px;
+    display: block;
+    line-height: 1.2;
+}
+header {
+    position: relative; /* Necesario para que el posicionamiento de #consecutivo-display funcione */
+}
+/* --- CORRECCIÓN FORZADA (RESET COMPLETO DE TABLA) --- */
+
+/* --- CORRECCIÓN FORZADA (CON ESPACIOS CORREGIDOS) --- */
+
+/* 1. Asegura que la tabla se comporte como tabla */
+#formato-completo .table-wrapper table[data-tipo-estabilidad] {
+    display: table !important;
+    border-collapse: collapse !important;
+    border-spacing: 0 !important;
+}
+
+/* 2. Asegura que el tbody se comporte como grupo de filas */
+#formato-completo .table-wrapper table[data-tipo-estabilidad] tbody {
+	display: table-row-group !important;
+}
+
+/* 3. Asegura que las filas se comporten como filas */
+#formato-completo .table-wrapper table[data-tipo-estabilidad] tr {
+	display: table-row !important;
+    position: static !important;
+    float: none !important;
+}
+
+/* 4. Asegura que las celdas se comporten como celdas */
+#formato-completo .table-wrapper table[data-tipo-estabilidad] td,
+#formato-completo .table-wrapper table[data-tipo-estabilidad] th {
+	display: table-cell !important;
+    position: static !important;
+    float: none !important;
+}
+
+/* 5. Mantiene el alineado superior */
+#formato-completo .table-wrapper table[data-tipo-estabilidad] td[data-analisis] {
+    vertical-align: top !important;
+    padding-top: 15px; /* Opcional */
+}
+    </style>
+    
+
+</head>
+<body>
+    <div class="container">
+        <header>
+    <img src="logo.png" alt="Samara Cosmetics Logo" />
+    <h1>Formato Completo de Estabilidad</h1>
+
+    <div id="consecutivo-display">
+        <span>Consecutivo</span>
+        <strong id="consecutivo-numero">--</strong>
+    </div>
+
+    <a href="seguimiento.html" class="btn">ᐊ Volver a Seguimiento</a>
+</header>
+
+        <form id="formato-completo">
+            <h2>INFORMACIÓN GENERAL</h2>
+            <div class="table-wrapper">
+                <table>
+                    <tbody>
+                        <tr><td class="label">Notificación sanitaria</td><td><input type="text" name="nso" /></td></tr>
+                        <tr><td class="label">Producto</td><td><input type="text" name="producto" required /></td></tr>
+                        <tr><td class="label">Número de lote</td><td><input type="text" name="lote" id="lote-principal" required /></td></tr>
+                        <tr><td class="label">Fabricante</td><td><input type="text" name="fabricante" /></td></tr>
+                        <tr><td class="label">Titular del registro</td><td><input type="text" name="titular" /></td></tr>
+                        <tr><td class="label">Lugar de realización del estudio</td><td><input type="text" name="lugar" /></td></tr>
+                        <tr><td class="label">Fecha inicio del estudio</td><td><input type="date" name="fecha_inicio" /></td></tr>
+                        <tr><td class="label">Fecha de finalización del estudio</td><td><input type="date" name="fecha_fin" /></td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Estabilidad Acelerada</h2>
+            <div class="table-wrapper">
+    <table data-tipo-estabilidad="Acelerada">
+        <thead>
+            <tr>
+                <th>Análisis</th>
+                <th>Parámetro evaluado</th>
+                <th>Método utilizado</th>
+                <th>Especific.</th>
+                <th>T0</th>
+                <th>T1</th>
+                <th>T2</th>
+                <th>T3</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="4" data-analisis="Organoléptico">Organoléptico</td>
+                <td data-parametro="Apariencia">Apariencia</td>
+                <td>Sensorial</td>
+                <td><textarea></textarea></td>
+                <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Color">Color</td><td>Sensorial</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Olor">Olor</td><td>Sensorial</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+               <td data-parametro="Aplicacion">Aplicacion</td><td>Sensorial</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+    <td rowspan="3" data-analisis="Fisicoquímico">Fisicoquímicos</td>
+    <td data-parametro="pH-select">pH</td><td>pHmetro</td><td><textarea></textarea></td>
+    <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+<tr>
+    <td data-parametro="Viscosidad-select">Viscosidad</td><td>Viscosímetro</td><td><textarea></textarea></td>
+    <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+<tr>
+    <td data-parametro="Gravedad especifica-select">Gravedad específica</td><td>Picnómetro</td><td><textarea></textarea></td>
+    <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+    <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+            <tr>
+   <td rowspan="4" data-analisis="Microbiológico">Microbiológico</td>
+   <td data-parametro="Recuento de mesofilos aerobios totales-select">Recuento de mesófilos aerobios totales</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+   <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+<tr>
+    <td data-parametro="Pseudomonas aeruginosa-select">Pseudomonas aeruginosa</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+   <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+<tr>
+    <td data-parametro="Escherichia Coli-select">Escherichia Coli</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+   <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+<tr>
+    <td data-parametro="Staphylococcus aureus-select">Staphylococcus aureus</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+   <td><select data-tiempo="T0"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T1"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T2"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+   <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+</tr>
+        </tbody>
+    </table>
+</div>
+            
+            <h2>Estabilidad Natural</h2>
+            <div class="table-wrapper">
+    <table data-tipo-estabilidad="Natural" data-results="select">
+        <thead>
+            <tr>
+                <th>Análisis</th>
+                <th>Parámetro evaluado</th>
+                <th>Método utilizado</th>
+                <th>Especific.</th>
+                <th>T3</th><th>T6</th><th>T9</th><th>T12</th><th>T18</th><th>T24</th><th>T27</th><th>T30</th><th>T33</th><th>T36</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td rowspan="4" data-analisis="Organoléptico">Organoléptico</td>
+                <td data-parametro="Apariencia">Apariencia</td>
+                <td>Sensorial</td>
+                <td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+                
+            <tr>
+                <td data-parametro="Color">Color</td><td>Sensorial</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Olor">Olor</td><td>Sensorial</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+               <td data-parametro="Aplicacion">Aplicacion</td><td>Sensorial</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td rowspan="3" data-analisis="Fisicoquímico">Fisicoquímicos</td>
+                <td data-parametro="pH-select">pH</td><td>pHmetro</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Viscosidad-select">Viscosidad</td><td>Viscosímetro</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Gravedad especifica-select">Gravedad específica</td><td>Picnómetro</td><td><textarea></textarea></td>
+                <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+                <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+               <td rowspan="4" data-analisis="Microbiológico">Microbiológico</td>
+               <td data-parametro="Recuento de mesofilos aerobios totales-select">Recuento de mesófilos aerobios totales</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Pseudomonas aeruginosa-select">Pseudomonas aeruginosa</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Escherichia Coli-select">Escherichia Coli</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+            <tr>
+                <td data-parametro="Staphylococcus aureus-select">Staphylococcus aureus</td><td>Siembra recuento total</td><td><textarea></textarea></td>
+               <td><select data-tiempo="T3"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T6"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T9"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T12"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T18"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T24"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T27"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T30"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T33"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+               <td><select data-tiempo="T36"><option selected></option><option>Cumple</option><option>No Cumple</option><option>No Aplica</option></select></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+           <h2 class="section-title-corrected">Parámetros Específicos</h2>
+<div class="container-corrected">
+
+    <div class="param-row">
+        
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="pH">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Acelerada</th></tr>
+                    <tr><th>Tiempo</th><th>pH</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
+                    <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
+                    <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+
+<div class="param-box-corrected">
+    <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="Viscosidad">
+        <thead>
+            <tr><th colspan="2">Estabilidad Acelerada</th></tr>
+            <tr><th>Tiempo</th><th>Viscosidad</th></tr>
+        </thead>
+        <tbody>
+            <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
+            <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
+            <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
+            <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+        </tbody>
+    </table>
+</div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Acelerada" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Acelerada</th></tr>
+                    <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T0</td><td class="value-cell"><input type="text" data-tiempo="T0" /></td></tr>
+                    <tr><td class="time-cell">T1</td><td class="value-cell"><input type="text" data-tiempo="T1" /></td></tr>
+                    <tr><td class="time-cell">T2</td><td class="value-cell"><input type="text" data-tiempo="T2" /></td></tr>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="param-row">
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="pH">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>pH</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Viscosidad">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>Viscosidad</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="param-box-corrected">
+            <table data-tipo-estabilidad="Natural" data-analisis="Fisicoquímico" data-parametro="Gravedad especifica">
+                <thead>
+                    <tr><th colspan="2">Estabilidad Natural</th></tr>
+                    <tr><th>Tiempo</th><th>Gravedad específica</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td class="time-cell">T3</td><td class="value-cell"><input type="text" data-tiempo="T3" /></td></tr>
+                    <tr><td class="time-cell">T6</td><td class="value-cell"><input type="text" data-tiempo="T6" /></td></tr>
+                    <tr><td class="time-cell">T9</td><td class="value-cell"><input type="text" data-tiempo="T9" /></td></tr>
+                    <tr><td class="time-cell">T12</td><td class="value-cell"><input type="text" data-tiempo="T12" /></td></tr>
+                    <tr><td class="time-cell">T18</td><td class="value-cell"><input type="text" data-tiempo="T18" /></td></tr>
+                    <tr><td class="time-cell">T24</td><td class="value-cell"><input type="text" data-tiempo="T24" /></td></tr>
+                    <tr><td class="time-cell">T27</td><td class="value-cell"><input type="text" data-tiempo="T27" /></td></tr>
+                    <tr><td class="time-cell">T30</td><td class="value-cell"><input type="text" data-tiempo="T30" /></td></tr>
+                    <tr><td class="time-cell">T33</td><td class="value-cell"><input type="text" data-tiempo="T33" /></td></tr>
+                    <tr><td class="time-cell">T36</td><td class="value-cell"><input type="text" data-tiempo="T36" /></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+            <h2>Microbiológicos</h2>
+<div class="table-wrapper micro-table">
+    <table data-tipo-estabilidad="Acelerada" data-analisis="Microbiológico">
+        <thead>
+            <tr><th colspan="5">Estabilidad Acelerada</th></tr>
+            <tr>
+                <th class="param-col">Tiempo</th>
+                <th>Recuento de mesófilos aerobios totales</th>
+                <th>Pseudomona aeruginosa</th>
+                <th>Escherichia Coli</th>
+                <th>Staphylococcus aureus</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="param-col">T0</td>
+                <td><input type="text" data-tiempo="T0" data-parametro="Recuento de mesofilos aerobios totales" /></td>
+                <td><input type="text" data-tiempo="T0" data-parametro="Pseudomonas aeruginosa" /></td>
+                <td><input type="text" data-tiempo="T0" data-parametro="Escherichia Coli" /></td>
+                <td><input type="text" data-tiempo="T0" data-parametro="Staphylococcus aureus" /></td>
+            </tr>
+            <tr>
+                <td class="param-col">T3</td>
+                <td><input type="text" data-tiempo="T3" data-parametro="Recuento de mesofilos aerobios totales" /></td>
+                <td><input type="text" data-tiempo="T3" data-parametro="Pseudomonas aeruginosa" /></td>
+                <td><input type="text" data-tiempo="T3" data-parametro="Escherichia Coli" /></td>
+                <td><input type="text" data-tiempo="T3" data-parametro="Staphylococcus aureus" /></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="table-wrapper micro-table">
+    <table data-tipo-estabilidad="Natural" data-analisis="Microbiológico">
+        <thead>
+            <tr><th colspan="5">Estabilidad Natural</th></tr>
+            <tr>
+                <th class="param-col">Tiempo</th>
+                <th>Recuento de mesófilos aerobios totales</th>
+                <th>Pseudomona aeruginosa</th>
+                <th>Escherichia Coli</th>
+                <th>Staphylococcus aureus</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="param-col">T6</td><td><input type="text" data-tiempo="T6" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T6" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T6" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T6" data-parametro="Staphylococcus aureus" /></td></tr>
+            <tr><td class="param-col">T12</td><td><input type="text" data-tiempo="T12" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T12" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T12" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T12" data-parametro="Staphylococcus aureus" /></td></tr>
+            <tr><td class="param-col">T18</td><td><input type="text" data-tiempo="T18" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T18" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T18" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T18" data-parametro="Staphylococcus aureus" /></td></tr>
+            <tr><td class="param-col">T24</td><td><input type="text" data-tiempo="T24" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T24" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T24" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T24" data-parametro="Staphylococcus aureus" /></td></tr>
+            <tr><td class="param-col">T30</td><td><input type="text" data-tiempo="T30" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T30" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T30" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T30" data-parametro="Staphylococcus aureus" /></td></tr>
+            <tr><td class="param-col">T36</td><td><input type="text" data-tiempo="T36" data-parametro="Recuento de mesofilos aerobios totales" /></td><td><input type="text" data-tiempo="T36" data-parametro="Pseudomonas aeruginosa" /></td><td><input type="text" data-tiempo="T36" data-parametro="Escherichia Coli" /></td><td><input type="text" data-tiempo="T36" data-parametro="Staphylococcus aureus" /></td></tr>
+        </tbody>
+    </table>
+</div>
+             <div class="table-wrapper">
+                <table data-tipo-estabilidad="Natural" data-analisis="Microbiológico">
+                      </table>
+            </div>
+        </form>
+
+        <button type="button" class="btn" style="background-color: #65b45a" onclick="guardarFormulario()">💾 Guardar Producto</button>
+
+<button type="button" class="btn" style="background-color: #c82333;" onclick="cerrarProducto()">🔐 Cerrar producto completado</button>
+    </div>
+
+    <script>
+        
+
+async function cerrarProducto() {
+    const form = document.getElementById('formato-completo');
+    const loteInput = document.getElementById('lote-principal');
+    const lote = loteInput.value;
+
+    // 1. Validación previa
+    if (!form.checkValidity()) {
+        alert("⚠️ Faltan campos obligatorios por completar. No se puede cerrar el producto.");
+        return;
+    }
+    if (!lote) {
+        alert("No se ha podido identificar el lote del producto a cerrar.");
+        return;
+    }
+
+    // 2. Mensaje de confirmación
+    const confirmacion = confirm("⚠️ ¿Está seguro de que desea cerrar este producto? Una vez cerrado, no podrá ser modificado nuevamente.");
+
+    if (confirmacion) {
+        // 3. Al aceptar el cierre
+        try {
+            const response = await fetch(`/api/productos/${lote}/cerrar`, {
+                method: 'POST'
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error del servidor');
+            }
+
+            alert(`✅ ${data.message}`);
+            window.location.href = 'seguimiento.html'; // Redirige al módulo principal
+
+        } catch (error) {
+            console.error('Error al intentar cerrar el producto:', error);
+            alert(`No se pudo cerrar el producto: ${error.message}`);
+        }
+    }
+}
+      // ---  FUNCIÓN AUXILIAR PARA AÑADIR MESES A UNA FECHA ---
+function addMonths(dateString, months) {
+    if (!dateString) return '';
+    const baseDate = new Date(dateString + 'T00:00:00');
+    baseDate.setMonth(baseDate.getMonth() + months);
+    return baseDate.toISOString().split('T')[0];
+}
+
+// ---  FUNCIÓN PRINCIPAL PARA CALCULAR Y ASIGNAR TODAS LAS FECHAS ---
+function actualizarFechasEstabilidad() {
+    const fechaInicio = document.querySelector('[name="fecha_inicio"]').value;
+
+    // Asigna T0
+    const t0Field = document.querySelector('[name="acelerada_t0"]');
+    if(t0Field) t0Field.value = fechaInicio;
+
+    // Asigna el resto de fechas calculadas
+    document.querySelector('[name="acelerada_t1"]').value = addMonths(fechaInicio, 1);
+    document.querySelector('[name="acelerada_t2"]').value = addMonths(fechaInicio, 2);
+    document.querySelector('[name="acelerada_t3"]').value = addMonths(fechaInicio, 3);
+    document.querySelector('[name="natural_t3"]').value = addMonths(fechaInicio, 3);
+    document.querySelector('[name="natural_t6"]').value = addMonths(fechaInicio, 6);
+    document.querySelector('[name="natural_t9"]').value = addMonths(fechaInicio, 9);
+    document.querySelector('[name="natural_t12"]').value = addMonths(fechaInicio, 12);
+    document.querySelector('[name="natural_t18"]').value = addMonths(fechaInicio, 18);
+    document.querySelector('[name="natural_t24"]').value = addMonths(fechaInicio, 24);
+    document.querySelector('[name="natural_t36"]').value = addMonths(fechaInicio, 36);
+}
+    document.addEventListener('DOMContentLoaded', () => {
+    // ...  código existente para autoResize ...
+    document.querySelector('[name="fecha_inicio"]').addEventListener('change', actualizarFechasEstabilidad);
+    const urlParams = new URLSearchParams(window.location.search);
+    const lote = urlParams.get('lote');
+    const consecutivo = urlParams.get('consecutivo'); // <-- Línea nueva
+
+    // Lógica para mostrar el consecutivo
+    if (consecutivo) {
+        document.getElementById('consecutivo-numero').innerText = consecutivo;
+    }
+
+    if (lote) {
+        document.getElementById('lote-principal').readOnly = true;
+        cargarDatosDeProducto(lote);
+    }
+});
+
+    
+
+async function cargarDatosDeProducto(lote) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/productos/${lote}`);
+        if (!response.ok) throw new Error('Producto no encontrado');
+        
+        const data = await response.json();
+        const { resultados, ...producto } = data;
+
+        // 1. Rellena los campos de "Información General" y las fechas
+        for (const key in producto) {
+            const field = document.querySelector(`[name="${key}"]`);
+            if (field) {
+                field.value = producto[key] ? (field.type === 'date' ? producto[key].split('T')[0] : producto[key]) : '';
+            }
+        }
+
+        if (!resultados || resultados.length === 0) return;
+
+        // 2. Rellena las tablas de análisis principales (las que tienen los <select>)
+        document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
+            let analisisActual = '';
+            tabla.querySelectorAll('tbody tr').forEach(fila => {
+                const celdaAnalisis = fila.querySelector('td[data-analisis]');
+                if (celdaAnalisis) {
+                    analisisActual = celdaAnalisis.dataset.analisis;
+                }
+
+                const celdaParametro = fila.querySelector('td[data-parametro]');
+                if (celdaParametro) {
+                    const parametro_evaluado = celdaParametro.dataset.parametro;
+
+                    // Busca el primer resultado que coincida para obtener la especificación
+                    const resultadoParaFila = resultados.find(r => 
+                        r.analisis === analisisActual && 
+                        r.parametro_evaluado.startsWith(parametro_evaluado)
+                    );
+
+                    // Rellena la especificación usando la lógica de rowspan
+                    const especificacionCellIndex = celdaAnalisis ? 3 : 2;
+                    const inputEspecificacion = fila.cells[especificacionCellIndex]?.querySelector('textarea');
+                    if (inputEspecificacion && resultadoParaFila && resultadoParaFila.especificacion) {
+                        inputEspecificacion.value = resultadoParaFila.especificacion;
+                    }
+
+                    // Rellena cada <select> de la fila
+                    fila.querySelectorAll('select[data-tiempo]').forEach(select => {
+                        const tiempo = select.dataset.tiempo;
+                        const resultadoEspecifico = resultados.find(r => 
+                            r.analisis === analisisActual &&
+                            r.parametro_evaluado.startsWith(parametro_evaluado) &&
+                            r.tiempo === tiempo
+                        );
+                        if (resultadoEspecifico) {
+                            select.value = resultadoEspecifico.resultado;
+                        }
+                    });
+                }
+            });
+        });
+
+        
+
+    // 3. Rellena las tablas de Parámetros Específicos y Microbiológicos
+    resultados.forEach(r => {
+        // Selector para Parámetros Específicos
+        let selector = `.container-corrected table[data-tipo-estabilidad="${r.tipo_estabilidad}"][data-parametro="${r.parametro_evaluado}"] input[data-tiempo="${r.tiempo}"]`;
+        let campo = document.querySelector(selector);
+        
+        // Selector para Microbiológicos
+        if (!campo) {
+            selector = `.micro-table table[data-tipo-estabilidad="${r.tipo_estabilidad}"] input[data-parametro="${r.parametro_evaluado}"][data-tiempo="${r.tiempo}"]`;
+            campo = document.querySelector(selector);
+        }
+
+        if (campo) {
+            campo.value = r.resultado;
+        }
+    });
+        
+        // Ajusta la altura de los textarea después de llenarlos
+        document.querySelectorAll('textarea').forEach(autoResize);
+
+    } catch (error) {
+        console.error('Error al cargar datos del producto:', error);
+        alert(error.message);
+    }
+}
+
+
+async function guardarFormulario() {
+    const form = document.getElementById('formato-completo');
+    if (!form.checkValidity()) {
+        alert("Por favor, complete los campos obligatorios.");
+        return;
+    }
+
+    // 1. Recopila los datos de "Información General" y las fechas (tu lógica original)
+    const producto = {};
+    form.querySelectorAll('.table-wrapper:first-of-type [name], input[type="date"][name]').forEach(field => {
+        if (field.value) {
+            producto[field.name] = field.value;
+        }
+    });
+
+    const resultados = [];
+
+    // 2. Recopila los resultados de las tablas PRINCIPALES (las que tienen los <select>)
+    document.querySelectorAll('table[data-tipo-estabilidad]').forEach(tabla => {
+        const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
+        let analisisActual = '';
+
+        tabla.querySelectorAll('tbody tr').forEach(fila => {
+            const celdaAnalisis = fila.querySelector('td[data-analisis]');
+            if (celdaAnalisis) {
+                analisisActual = celdaAnalisis.dataset.analisis;
+            }
+
+            const celdaParametro = fila.querySelector('td[data-parametro]');
+            if (celdaParametro) {
+                const parametro_evaluado = celdaParametro.dataset.parametro;
+                
+                // Lógica corregida para encontrar la celda de "Especific." manejando rowspan
+                const especificacionCellIndex = celdaAnalisis ? 3 : 2;
+                const especificacion = fila.cells[especificacionCellIndex]?.querySelector('textarea')?.value || '';
+
+                // Itera por las celdas restantes para obtener los resultados de los <select>
+                const inicioCeldasResultado = especificacionCellIndex + 1;
+                for (let i = inicioCeldasResultado; i < fila.cells.length; i++) {
+                    const select = fila.cells[i]?.querySelector('select[data-tiempo]');
+                    if (select && select.value) {
+                        resultados.push({
+                            tipo_estabilidad,
+                            analisis: analisisActual,
+                            parametro_evaluado,
+                            tiempo: select.dataset.tiempo,
+                            especificacion, // Se guarda la especificación correcta para cada resultado
+                            resultado: select.value
+                        });
+                    }
+                }
+            }
+        });
+    });
+    // ... fin del primer bucle 'resultados.push'
+    
+
+    // 3. Recopila los resultados de "Parámetros Específicos" y "Microbiológicos"
+    document.querySelectorAll('.container-corrected table, .micro-table table').forEach(tabla => {
+        const tipo_estabilidad = tabla.dataset.tipoEstabilidad;
+        const analisis = tabla.dataset.analisis;
+        
+        // Bucle para Parámetros Específicos
+        if (tabla.closest('.container-corrected')) {
+            const parametro = tabla.dataset.parametro;
+            tabla.querySelectorAll('tbody input[data-tiempo]').forEach(input => {
+                if (input.value) {
+                    resultados.push({ tipo_estabilidad, analisis, parametro_evaluado: parametro, tiempo: input.dataset.tiempo, especificacion: '', resultado: input.value });
+                }
+            });
+        }
+        // Bucle específico para Microbiológicos
+        else if (tabla.closest('.micro-table')) {
+            tabla.querySelectorAll('tbody input[data-tiempo][data-parametro]').forEach(input => {
+                if (input.value) {
+                    resultados.push({ tipo_estabilidad, analisis, parametro_evaluado: input.dataset.parametro, tiempo: input.dataset.tiempo, especificacion: '', resultado: input.value });
+                }
+            });
+        }
+    });
+
+
+
+    
+    // 4. Unifica todo y envía al servidor (tu lógica original)
+    const payload = { ...producto, resultados };
+    const loteInput = document.getElementById('lote-principal');
+    const esModoEdicion = loteInput.readOnly;
+    let url = '/api/productos';
+    let method = 'POST';
+
+    if (esModoEdicion) {
+        url = `/api/productos/${loteInput.value}`;
+        method = 'PUT';
+    }
+
+    try {
+        const response = await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message || 'Error del servidor');
+        alert(data.message);
+        window.location.href = 'seguimiento.html';
+    } catch (error) {
+        console.error('Error al guardar:', error);
+        alert(`No se pudo guardar: ${error.message}`);
+    }
+}
+
+    function autoResize(el) {
+        el.style.height = 'auto';
+        el.style.height = (el.scrollHeight) + 'px';
+    }
+</script>
+</body>
+</html>

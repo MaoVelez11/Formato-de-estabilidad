@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Seguimiento de Productos en Estabilidad</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+        body { font-family: Arial, sans-serif; background: #fdfdfd; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; border-bottom: 3px solid #e6b8af; padding-bottom: 25px; flex-wrap: wrap; }
+        .header-title { display: flex; align-items: center; gap: 15px; }
+        .header-actions { display: flex; gap: 10px; }
+        .header-actions .btn { padding: 8px 16px; font-size: 14px; margin-top: 0; }
+        header img { height: 60px; }
+        header h1 { color: #6a4f6d; font-size: 24px; margin: 0; }
+        .search-container { display: flex; gap: 10px; align-items: center; width: 100%; margin-top: 15px; }
+        #searchInput { flex-grow: 1; padding: 8px 12px; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; }
+        .search-container .btn { margin-top: 0; }
+        h2 { background: #e6b8af; padding: 10px; text-align: center; font-size: 18px; color: #fff; border-radius: 5px; }
+        table { border-collapse: collapse; margin-bottom: 25px; width: 100%; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        th, td { border: 1px solid #ccc; padding: 4px; text-align: center; vertical-align: top; }
+        td input[type='text'], td input[type='number'], td input[type='date'], td textarea { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-family: Arial, sans-serif; font-size: 14px; }
+        td textarea { min-height: 40px; resize: vertical; }
+        input[readonly] { background-color: #e9ecef; cursor: not-allowed; }
+        th { background-color: #f0f0f0; color: #333; }
+        .acelerada { background-color: #fdd; } .natural { background-color: #dfd; } .aprobacion { background-color: #ffecb3; }
+        #tablaEstabilidad thead tr:nth-child(2) th { background-color: #fff; }
+        .table-wrapper { overflow-x: auto; }
+        .btn { padding: 10px 20px; background: #f37f58; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
+        .btn:hover { background: #e06d4a; }
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-title">
+                <img src="logo.png" alt="Samara Cosmetics Logo" />
+                <h1>Módulo de Seguimiento de Estabilidad</h1>
+            </div>
+            <div class="header-actions">
+                <a href="formato.html" class="btn">➕ Agregar producto</a>
+                <button class="btn" style="background-color: #dc3545" onclick="eliminarFila()">🗑️ Eliminar Fila</button>
+                <button class="btn" style="background-color: #65b45a" onclick="guardarDatosSeguimiento()">💾 Guardar Datos</button>
+            </div>
+            <div class="search-container">
+                <input type="search" id="searchInput" placeholder="Buscar por producto, lote o referencia...">
+                <button class="btn" onclick="realizarBusqueda()">🔍 Buscar</button>
+            </div>
+        </header>
+
+        <h2>SEGUIMIENTO PRODUCTOS EN PRUEBAS DE ESTABILIDAD ACELERADA Y NATURAL</h2>
+        <div class="table-wrapper">
+            <table id="tablaEstabilidad">
+                <thead>
+                    <tr>
+                        <th rowspan="2">✔</th><th rowspan="2">Consecutivo</th><th rowspan="2">Referencia</th><th rowspan="2">Producto</th>
+                        <th rowspan="2">Registro Sanitario</th><th rowspan="2">Lote</th><th rowspan="2">Descripción</th>
+                        <th rowspan="2">Pruebas</th><th rowspan="2">Observaciones</th><th rowspan="2">Total Unidades</th>
+                        <th class="acelerada" colspan="6">Estabilidad Acelerada</th>
+                        <th class="natural" colspan="12">Estabilidad Natural</th>
+                        <th class="aprobacion" colspan="2">Aprobación</th>
+                        <th rowspan="2">Tiempo Exp. (meses)</th><th colspan="2">Estadísticos</th>
+                        <th rowspan="2">Comentarios</th><th rowspan="2">Acción</th>
+                    </tr>
+                    <tr>
+                        <th>Cantidad</th><th>Ubicación</th><th>T0</th><th>T1</th><th>T2</th><th>T3</th>
+                        <th>Cantidad</th><th>Ubicación</th><th>T3</th><th>T6</th><th>T9</th><th>T12</th>
+                        <th>T18</th><th>T24</th><th>T27</th><th>T30</th><th>T33</th><th>T36</th>
+                        <th>Sin Fecha Exp.</th><th>Con Fecha Exp.</th><th>Sí</th><th>No</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('pageshow', () => {
+            cargarProductos();
+            document.getElementById('searchInput').value = '';
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') realizarBusqueda();
+        });
+
+        function renderizarTabla(productos) {
+            const tbody = document.getElementById('tablaEstabilidad').getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+            if (!productos || productos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="34" style="text-align:center; padding: 20px;">No se encontraron productos.</td></tr>`;
+                return;
+            }
+            productos.forEach((producto, index) => {
+                const productoConFechas = calcularYAsignarFechas(producto);
+                // DESPUÉS:
+                const nuevaFila = tbody.insertRow(-1);
+                
+
+
+nuevaFila.innerHTML = `
+    <td><input type="checkbox" /></td>
+    <td class="consec">${productoConFechas.consecutivo}</td>
+    <td><input type="text" name="referencia" class="campo" value="${productoConFechas.referencia || ''}" /></td>
+    <td><textarea name="producto" class="campo">${productoConFechas.producto || ''}</textarea></td>
+    <td><input type="text" name="nso" class="campo" value="${productoConFechas.nso || ''}" /></td>
+    <td><input type="text" name="lote" class="campo" value="${productoConFechas.lote || ''}" readonly style="background-color:#eee;" /></td>
+    <td><textarea name="descripcion" class="campo">${productoConFechas.descripcion || ''}</textarea></td>
+    <td><textarea name="pruebas" class="pruebas">${productoConFechas.pruebas || ''}</textarea></td>
+    <td><textarea name="observaciones">${productoConFechas.observaciones || ''}</textarea></td>
+    <td><input type="number" name="total_unidades" min="0" value="${productoConFechas.total_unidades || '0'}" class="total-unidades" readonly /></td>
+    
+    <td><input type="number" name="acelerada_cantidad" min="0" value="${productoConFechas.acelerada_cantidad || ''}" class="cantidad-acelerada" /></td>
+    <td><textarea name="acelerada_ubicacion">${productoConFechas.acelerada_ubicacion || ''}</textarea></td>
+    <td><input type="date" name="acelerada_t0" value="${(productoConFechas.acelerada_t0 || '').split('T')[0]}" onchange="actualizarFechasFila(this)" /></td>
+    <td><input type="date" name="acelerada_t1" value="${(productoConFechas.acelerada_t1 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="acelerada_t2" value="${(productoConFechas.acelerada_t2 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="acelerada_t3" value="${(productoConFechas.acelerada_t3 || '').split('T')[0]}" readonly /></td>
+    
+    <td><input type="number" name="natural_cantidad" min="0" value="${productoConFechas.natural_cantidad || ''}" class="cantidad-natural" /></td>
+    <td><textarea name="natural_ubicacion">${productoConFechas.natural_ubicacion || ''}</textarea></td>
+    <td><input type="date" name="natural_t3" value="${(productoConFechas.natural_t3 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t6" value="${(productoConFechas.natural_t6 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t9" value="${(productoConFechas.natural_t9 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t12" value="${(productoConFechas.natural_t12 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t18" value="${(productoConFechas.natural_t18 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t24" value="${(productoConFechas.natural_t24 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t27" value="${(productoConFechas.natural_t27 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t30" value="${(productoConFechas.natural_t30 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t33" value="${(productoConFechas.natural_t33 || '').split('T')[0]}" readonly /></td>
+    <td><input type="date" name="natural_t36" value="${(productoConFechas.natural_t36 || '').split('T')[0]}" readonly /></td>
+    
+    <td><input type="radio" name="aprob${productoConFechas.consecutivo}" value="Sin Fecha Exp." ${productoConFechas.aprobacion === 'Sin Fecha Exp.' ? 'checked' : ''} /></td>
+    <td><input type="radio" name="aprob${productoConFechas.consecutivo}" value="Con Fecha Exp." ${productoConFechas.aprobacion === 'Con Fecha Exp.' ? 'checked' : ''} /></td>
+    
+    <td><input type="number" name="tiempo_exp_meses" min="0" value="${productoConFechas.tiempo_exp_meses || ''}" /></td>
+
+    <td><input type="radio" name="estad${productoConFechas.consecutivo}" value="si" ${productoConFechas.estadisticos === 'si' ? 'checked' : ''} /></td>
+    <td><input type="radio" name="estad${productoConFechas.consecutivo}" value="no" ${productoConFechas.estadisticos === 'no' ? 'checked' : ''} /></td>
+
+    <td><textarea name="comentarios">${productoConFechas.comentarios || ''}</textarea></td>
+    <td><button class="btn" style="padding: 6px 12px; font-size: 12px" onclick="editarProducto(this, ${productoConFechas.consecutivo})">Acceder / Editar</button></td>
+`;
+                asignarEventosFila(nuevaFila);
+            });
+        }
+
+        // Busca esta función en seguimiento.html
+async function cargarProductos() {
+    try {
+        const response = await fetch('http://localhost:3000/api/productos');
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        const productos = await response.json();
+        renderizarTabla(productos);
+    } catch (error) {
+        console.error('DETALLE DEL ERROR al cargar:', error);
+        alert('No se pudo conectar con el servidor para cargar los datos.');
+    }
+}
+
+async function realizarBusqueda() {
+    const termino = document.getElementById('searchInput').value;
+    let url = `http://localhost:3000/api/productos/buscar?termino=${encodeURIComponent(termino)}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Error en la respuesta del servidor');
+        const productos = await response.json();
+        renderizarTabla(productos);
+    } catch (error) {
+        console.error('DETALLE DEL ERROR al buscar:', error);
+        alert('Ocurrió un error al realizar la búsqueda.');
+    }
+}
+
+        function addMonths(dateString, months) {
+    if (!dateString) return '';
+    const baseDate = new Date(dateString + 'T00:00:00');
+    baseDate.setMonth(baseDate.getMonth() + months);
+    return baseDate.toISOString().split('T')[0];
+}
+
+
+function actualizarFechasFila(inputT0) {
+    const fila = inputT0.closest('tr');
+    const fechaInicio = inputT0.value;
+
+    // Actualiza las fechas de Estabilidad Acelerada en la fila
+    fila.querySelector('[name="acelerada_t1"]').value = addMonths(fechaInicio, 1);
+    fila.querySelector('[name="acelerada_t2"]').value = addMonths(fechaInicio, 2);
+    fila.querySelector('[name="acelerada_t3"]').value = addMonths(fechaInicio, 3);
+
+    // Actualiza las fechas de Estabilidad Natural en la fila
+    fila.querySelector('[name="natural_t3"]').value = addMonths(fechaInicio, 3);
+    fila.querySelector('[name="natural_t6"]').value = addMonths(fechaInicio, 6);
+    fila.querySelector('[name="natural_t9"]').value = addMonths(fechaInicio, 9);
+    fila.querySelector('[name="natural_t12"]').value = addMonths(fechaInicio, 12);
+    fila.querySelector('[name="natural_t18"]').value = addMonths(fechaInicio, 18);
+    fila.querySelector('[name="natural_t24"]').value = addMonths(fechaInicio, 24);
+    fila.querySelector('[name="natural_t27"]').value = addMonths(fechaInicio, 27);
+    fila.querySelector('[name="natural_t30"]').value = addMonths(fechaInicio, 30);
+    fila.querySelector('[name="natural_t33"]').value = addMonths(fechaInicio, 33);
+    fila.querySelector('[name="natural_t36"]').value = addMonths(fechaInicio, 36);
+}
+
+        function calcularYAsignarFechas(producto) {
+            const fechaInicio = producto.fecha_inicio ? producto.fecha_inicio.split('T')[0] : null;
+            if (!fechaInicio) return producto;
+            const fechasCalculadas = { acelerada_t0: fechaInicio, acelerada_t1: addMonths(fechaInicio, 1), acelerada_t2: addMonths(fechaInicio, 2), acelerada_t3: addMonths(fechaInicio, 3), natural_t3: addMonths(fechaInicio, 3), natural_t6: addMonths(fechaInicio, 6), natural_t9: addMonths(fechaInicio, 9), natural_t12: addMonths(fechaInicio, 12), natural_t18: addMonths(fechaInicio, 18), natural_t24: addMonths(fechaInicio, 24), natural_t27: addMonths(fechaInicio, 27), natural_t30: addMonths(fechaInicio, 30), natural_t33: addMonths(fechaInicio, 33), natural_t36: addMonths(fechaInicio, 36) };
+            return { ...fechasCalculadas, ...producto };
+        }
+
+        function actualizarTotalUnidades(fila) {
+            const cantAcelerada = fila.querySelector('.cantidad-acelerada');
+            const cantNatural = fila.querySelector('.cantidad-natural');
+            const totalUnidades = fila.querySelector('.total-unidades');
+            totalUnidades.value = (parseInt(cantAcelerada.value, 10) || 0) + (parseInt(cantNatural.value, 10) || 0);
+        }
+        
+        function asignarEventosFila(fila) {
+            fila.querySelectorAll('textarea').forEach(area => { autoResize(area); area.addEventListener('input', () => autoResize(area)); });
+            fila.querySelector('.cantidad-acelerada').addEventListener('input', () => actualizarTotalUnidades(fila));
+            fila.querySelector('.cantidad-natural').addEventListener('input', () => actualizarTotalUnidades(fila));
+            actualizarTotalUnidades(fila);
+        }
+
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = (el.scrollHeight) + 'px';
+        }
+
+        async function guardarDatosSeguimiento() {
+    const filas = document.querySelectorAll('#tablaEstabilidad tbody tr');
+    if (filas.length === 0 || (filas.length === 1 && filas[0].cells.length === 1)) {
+        return alert("No hay productos para guardar.");
+    }
+
+    const promesasDeActualizacion = [];
+
+    for (const fila of filas) {
+        const lote = fila.cells[5].querySelector('input').value;
+        if (!lote) continue;
+
+        const datosFila = {
+            referencia: fila.cells[2].querySelector('input').value,
+            producto: fila.cells[3].querySelector('textarea').value,
+            nso: fila.cells[4].querySelector('input').value,
+            descripcion: fila.cells[6].querySelector('textarea').value,
+            pruebas: fila.cells[7].querySelector('textarea').value,
+            observaciones: fila.cells[8].querySelector('textarea').value,
+            total_unidades: fila.cells[9].querySelector('input').value,
+            acelerada_cantidad: fila.cells[10].querySelector('input').value,
+            acelerada_ubicacion: fila.cells[11].querySelector('textarea').value,
+            acelerada_t0: fila.cells[12].querySelector('input').value || null,
+            acelerada_t1: fila.cells[13].querySelector('input').value || null,
+            acelerada_t2: fila.cells[14].querySelector('input').value || null,
+            acelerada_t3: fila.cells[15].querySelector('input').value || null,
+            natural_cantidad: fila.cells[16].querySelector('input').value,
+            natural_ubicacion: fila.cells[17].querySelector('textarea').value,
+            natural_t3: fila.cells[18].querySelector('input').value || null,
+            natural_t6: fila.cells[19].querySelector('input').value || null,
+            natural_t9: fila.cells[20].querySelector('input').value || null,
+            natural_t12: fila.cells[21].querySelector('input').value || null,
+            natural_t18: fila.cells[22].querySelector('input').value || null,
+            natural_t24: fila.cells[23].querySelector('input').value || null,
+            natural_t27: fila.cells[24].querySelector('input').value || null,
+            natural_t30: fila.cells[25].querySelector('input').value || null,
+            natural_t33: fila.cells[26].querySelector('input').value || null,
+            natural_t36: fila.cells[27].querySelector('input').value || null,
+            aprobacion: fila.querySelector('input[name^="aprob"]:checked')?.value || '',
+            tiempo_exp_meses: fila.cells[30].querySelector('input').value,
+            estadisticos: fila.querySelector('input[name^="estad"]:checked')?.value || '',
+            comentarios: fila.cells[33].querySelector('textarea').value,
+        };
+
+        const peticion = fetch(`http://localhost:3000/api/productos/${lote}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosFila)
+        });
+        promesasDeActualizacion.push(peticion);
+    }
+
+    try {
+        await Promise.all(promesasDeActualizacion);
+        alert('Todos los cambios han sido guardados con éxito.');
+    } catch (error) {
+        console.error('Error al guardar los datos:', error);
+        alert('Hubo un error al guardar los cambios.');
+    }
+}
+
+        function actualizarConsecutivos() {
+            document.querySelectorAll('#tablaEstabilidad tbody tr').forEach((fila, i) => {
+                const consec_cell = fila.querySelector('.consec');
+                if (consec_cell) consec_cell.innerText = i + 1;
+            });
+        }
+        
+        function eliminarFila() {
+            const filasParaEliminar = Array.from(document.querySelectorAll("#tablaEstabilidad tbody input[type='checkbox']:checked"));
+            if (filasParaEliminar.length === 0) return alert('Por favor, seleccione al menos una fila para eliminar.');
+            
+            if (confirm(`¿Está seguro de que desea eliminar ${filasParaEliminar.length} fila(s)?`)) {
+                filasParaEliminar.forEach(chk => {
+                    const fila = chk.closest('tr');
+                    const lote = fila.cells[5].querySelector('input').value;
+                    fetch(`http://localhost:3000/api/productos/${lote}`, { method: 'DELETE' })
+                    .then(res => res.ok ? res.json() : Promise.reject('Error en el servidor'))
+                    .then(data => { console.log(data.message); fila.remove(); actualizarConsecutivos(); })
+                    .catch(error => { console.error('Error al eliminar:', error); alert('No se pudo eliminar el producto.'); });
+                });
+            }
+        }
+
+        function editarProducto(boton, consecutivo) {
+    const fila = boton.closest('tr');
+    const lote = fila.cells[5].querySelector('input').value;
+    if (lote) {
+        // Ahora pasamos tanto el lote como el consecutivo
+        window.location.href = `formato.html?lote=${encodeURIComponent(lote)}&consecutivo=${consecutivo}`;
+    } else {
+        alert('No se encontró un número de lote para este producto.');
+    }
+}
+    </script>
+</body>
+</html>
