@@ -25,10 +25,56 @@
         th { background-color: #f0f0f0; color: #333; }
         .acelerada { background-color: #fdd; } .natural { background-color: #dfd; } .aprobacion { background-color: #ffecb3; }
         #tablaEstabilidad thead tr:nth-child(2) th { background-color: #fff; }
-        .table-wrapper { overflow-x: auto; }
+        .table-wrapper {
+    overflow-x: auto; /* Mantiene el scroll horizontal */
+    overflow-y: auto; /* AÑADE un scroll vertical */
+    
+    /* Esta es la clave: limita la altura de la tabla */
+    max-height: 70vh; 
+    /* (70vh = 70% de la altura de la ventana. 
+        Puedes cambiarlo a 60vh, 80vh, o un valor fijo como 600px) */
+}
         .btn { padding: 10px 20px; background: #f37f58; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; margin-top: 15px; }
         .btn:hover { background: #e06d4a; }
         
+      /* --- INICIO CORRECCIÓN --- */
+
+/* 1. Fija la primera columna (Checkbox) Y LE DA UN ANCHO FIJO */
+#tablaEstabilidad th:nth-child(1),
+#tablaEstabilidad td:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background-color: #fdfdfd;
+    box-shadow: 3px 0 5px -2px rgba(0,0,0,0.1);
+    
+    /* AÑADIDO: Damos un ancho mínimo fijo a la columna 1 */
+    min-width: 55px; 
+    width: 55px;
+}
+
+/* 2. Fija la segunda columna (Consecutivo) a la izquierda */
+#tablaEstabilidad th:nth-child(2),
+#tablaEstabilidad td:nth-child(2) {
+    position: sticky;
+    
+    /* CORRECCIÓN: Usamos el mismo ancho de la columna 1 */
+    left: 55px; /* Debe ser igual al 'width' de arriba */
+    
+    z-index: 2;
+    background-color: #fdfdfd;
+    box-shadow: 3px 0 5px -2px rgba(0,0,0,0.1);
+
+    /* AÑADIDO: Damos un ancho mínimo a esta columna */
+    min-width: 100px; 
+}
+
+/* 3. Ajuste para el fondo de las cabeceras */
+#tablaEstabilidad th:nth-child(1),
+#tablaEstabilidad th:nth-child(2) {
+    background-color: #f0f0f0; /* Color de fondo original de tus TH */
+}
+
     </style>
 </head>
 <body>
